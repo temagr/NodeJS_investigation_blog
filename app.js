@@ -4,7 +4,7 @@ const express = require('express'),
     LocalStrategy = require('passport-local').Strategy,
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
-    dataBase = require('./database')('Students', 'admin', '123456', {
+    dataBase = require('./database')('Blog', 'admin', '123456', {
         host: 'RUKAVITSINI',
         port: 1543,
         dialect: 'mssql'
@@ -23,40 +23,40 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 passport.use('local', new LocalStrategy((username, password, done) => {
-    if (username !== "1234" && password !== "1234") {
-        return done(null, false)
-    } else {
-        return done(null, {username, password});
-    }
+    dataBase.query(`SELECT userID,username, password FROM Credentials WHERE username='${username}' and password='${password}'`).spread((result, metadata) => {
+        console.log(result);
+        if (result.length === 1) {
+            return done(null, {
+                id: result.userId,
+                username: result.username
+            });
+        } else {
+            return done(null, false);
+        }
+    });
 }))
 
 app.get('/', (req, res) => {
-    res.send("Server is started");
+    return res.send("Server is started");
 });
 
 app.get('/login', (req, res) => {
     res.render('login');
 })
 
-app.post('/login/submitted', passport.authenticate('local', {
+app.post('/submitted', passport.authenticate('local', {
     session: false,
-    successRedirect: '/login/success',
-    failureRedirect: '/login/failure'
+    successRedirect: '/success',
+    failureRedirect: '/failure'
 }));
 
-app.get('/login/success', (req, res) => {
+app.get('/success', (req, res) => {
     res.send("Your authentication was successfull");
 });
 
-app.get('/login/failure', (req, res) => {
+app.get('/failure', (req, res) => {
     res.send("Your authentication has failed");
 });
-
-// dataBase.query('SELECT sID,sName FROM Student').spread((result, metadata) => {
-//     console.time("Request");
-//     console.log(result);
-//     console.timeEnd("Request");
-// });
 
 module.exports = app;
 

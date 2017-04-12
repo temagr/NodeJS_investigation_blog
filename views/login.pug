@@ -4,16 +4,19 @@ html(lang="en")
     link(rel="stylesheet",href="./css/vendor/bootstrap.min.css")
   body
     div.container
-      form
+      form(action="/login/submitted",method="POST")
         .form-group.row
           label.form-label.col-3(for="username").
             Username
           div.col-9
-            input#username.form-control(type="text",placeholder="Enter Login")
+            input#username.form-control(type="text",placeholder="Enter Login",name="username")
         .form-group.row
           label.form-label.col-3(for="password").
             Password
           div.col-9
-            input#password.form-control(type="text",placeholder="Enter Password")
+            input#password.form-control(type="text",placeholder="Enter Password",name="password")
+        .form-group.row
+          button.btn.btn-primary.offset-6(type="submit").
+            Submit
     script(src="./js/vendor/bootstrap.min.js")
     

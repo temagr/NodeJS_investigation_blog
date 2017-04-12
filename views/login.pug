@@ -1,0 +1,19 @@
+html(lang="en")
+  head
+    title Login form
+    link(rel="stylesheet",href="./css/vendor/bootstrap.min.css")
+  body
+    div.container
+      form
+        .form-group.row
+          label.form-label.col-3(for="username").
+            Username
+          div.col-9
+            input#username.form-control(type="text",placeholder="Enter Login")
+        .form-group.row
+          label.form-label.col-3(for="password").
+            Password
+          div.col-9
+            input#password.form-control(type="text",placeholder="Enter Password")
+    script(src="./js/vendor/bootstrap.min.js")
+    

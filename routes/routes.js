@@ -21,6 +21,13 @@ module.exports = function(passport) {
         failureRedirect: '/'
     }));
 
+    router.get('/login/facebook', passport.authenticate('facebook',{ scope : 'email' }));
+
+    router.get('/login/facebook/callback', passport.authenticate('facebook', {
+        successRedirect: '/profile',
+        failureRedirect: '/'
+    }));
+
     router.get('/logout', (req, res) => {
         req.logout();
         res.redirect('/');

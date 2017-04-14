@@ -1,10 +1,7 @@
 const LocalStrategy = require('passport-local').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy,
-    dataBase = require('../database/database')('Blog', 'admin', '123456', {
-        host: 'RUKAVITSINI',
-        port: 1543,
-        dialect: 'mssql'
-    });
+    User = require('../models/user.model');
+
 
 module.exports = function(passport){
 
@@ -17,15 +14,16 @@ module.exports = function(passport){
   });
 
   passport.use('local', new LocalStrategy((username, password, done) => {
-      dataBase(`SELECT userID,username, password FROM Credentials WHERE username='${username}' and password='${password}'`).spread((result, metadata) => {
-          if (result.length === 1) {
-              return done(null, {
-                  userId: result[0].userId,
-                  username: result[0].username
-              });
-          } else {
-              return done(null, false);
-          }
-      });
+      User.getUserInfoByCredentials(username, password)
+          .spread((result, metadata) => {
+            if (result.length === 1) {
+                return done(null, {
+                    userId: result[0].userId,
+                    username: result[0].username
+                });
+            } else {
+                return done(null, false);
+            }
+          });
   }));
 }

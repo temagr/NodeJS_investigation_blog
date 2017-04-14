@@ -2,14 +2,16 @@ const express = require('express'),
     path = require('path'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
+    FacebookStrategy = require('passport-facebook').Strategy,
+    configAuth = require('./config/auth'),
     bodyParser = require('body-parser'),
-    cookieParser = require('cookie-parser')
-    var session = require('express-session');
-    // dataBase = require('./database')('Blog', 'admin', '123456', {
-    //     host: 'RUKAVITSINI',
-    //     port: 1543,
-    //     dialect: 'mssql'
-    // });
+    cookieParser = require('cookie-parser'),
+    session = require('express-session');
+    dataBase = require('./database/database')('Blog', 'admin', '123456', {
+        host: 'RUKAVITSINI',
+        port: 1543,
+        dialect: 'mssql'
+    });
 
 let app = express();
 
@@ -40,7 +42,7 @@ passport.use('local', new LocalStrategy((username, password, done) => {
             username: username
         });
     } else {
-        return(null, false);
+        return done(null, false);
     }
     // dataBase.query(`SELECT userID,username, password FROM Credentials WHERE username='${username}' and password='${password}'`).spread((result, metadata) => {
     //     console.log(result);
@@ -56,37 +58,37 @@ passport.use('local', new LocalStrategy((username, password, done) => {
 }))
 
 app.get('/', (req, res) => {
-    return res.send("Server is started");
+    res.render('index');
 });
 
 app.get('/login', (req, res) => {
     res.render('login');
 })
 
-app.post('/submitted', passport.authenticate('local', {
-    session: false,
-    successRedirect: '/success',
-    failureRedirect: '/failure'
-}));
-
-app.get('/success', (req, res) => {
-    var session = req.session;
-    if (session.views) {
-        session.views++
-        res.write('<p>views: ' + session.views + '</p>')
-        res.write('<p>expires in: ' + (session.cookie.maxAge / 1000) + 's</p>')
-        res.end()
-    } else {
-        session.views = 1
-        res.write('<p> username:' + req.session.passport.user.username + '</p>');
-        res.end('welcome to the session demo. refresh!')
-    }
-    console.log(req.session);
-});
-
-app.get('/failure', (req, res) => {
-    res.send("Your authentication has failed");
-});
+// app.post('/submitted', passport.authenticate('local', {
+//     session: true,
+//     successRedirect: '/success',
+//     failureRedirect: '/failure'
+// }));
+//
+// app.get('/success', (req, res) => {
+//     var session = req.session;
+//     if (session.views) {
+//         session.views++
+//         res.write('<p>views: ' + session.views + '</p>')
+//         res.write('<p>expires in: ' + (session.cookie.maxAge / 1000) + 's</p>')
+//         res.end()
+//     } else {
+//         session.views = 1
+//         res.write('<p> username:' + req.session.passport.user.username + '</p>');
+//         res.end('welcome to the session demo. refresh!')
+//     }
+//     console.log(req.session);
+// });
+//
+// app.get('/failure', (req, res) => {
+//     res.send("Your authentication has failed");
+// });
 
 module.exports = app;
 

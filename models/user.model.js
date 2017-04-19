@@ -1,4 +1,6 @@
-const dataBase = require('../database/database')('Blog', 'admin', '123456', {
+const DB = require('../config/constants');
+
+const dataBase = require('../database/database')(DB.BLOG, 'admin', '123456', {
         host: 'RUKAVITSINI',
         port: 1543,
         dialect: 'mssql'
@@ -6,7 +8,15 @@ const dataBase = require('../database/database')('Blog', 'admin', '123456', {
     user = {};
 
 user.getUserInfoByCredentials = (username,password) =>{
-  return dataBase(`SELECT userID, Name, Email, Password FROM Users WHERE Name='${username}' and Password='${password}'`);
+  return dataBase(
+            `SELECT ${DB.columns.BLOG.USERS.USER_ID},
+                    ${DB.columns.BLOG.USERS.NAME},
+                    ${DB.columns.BLOG.USERS.EMAIL},
+                    ${DB.columns.BLOG.USERS.PASSWORD}
+            FROM ${DB.tables.BLOG.USERS}
+            WHERE ${DB.columns.BLOG.USERS.NAME}='${username}'
+                  and ${DB.columns.BLOG.USERS.PASSWORD}='${password}'`
+          );
 }
 
 // user.getUserByFacebookId = (id) => {

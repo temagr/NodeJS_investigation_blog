@@ -15,6 +15,15 @@ module.exports = function(passport) {
         res.render('profile');
     });
 
+    router.get('/profile/newPost', (req, res) => {
+        res.render('newPost');
+    });
+
+    router.post('/profile/newPost', (req, res) => {
+        console.log(req.body);
+        // res.redirect('/profile/newPost');
+    });
+
     router.post('/login', passport.authenticate('local', {
         session: true,
         successRedirect: '/profile',

@@ -16,9 +16,14 @@ module.exports = function(passport) {
     passport.use('local', new LocalStrategy((username, password, done) => {
         User.getUserInfoByCredentials(username, password).spread((result, metadata) => {
             if (result.length === 1) {
+                global.User = {
+                    id: result[0].userId,
+                    name: result[0].Name,
+                    password: result[0].password
+                };
                 return done(null, {
                     userId: result[0].userId,
-                    username: result[0].username
+                    username: result[0].Name
                 });
             } else {
                 return done(null, false);

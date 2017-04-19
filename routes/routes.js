@@ -1,5 +1,6 @@
 const express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    blog = require('../models/blog.model');
 
 module.exports = function(passport) {
 
@@ -20,8 +21,8 @@ module.exports = function(passport) {
     });
 
     router.post('/profile/newPost', (req, res) => {
-        console.log(req.body);
-        // res.redirect('/profile/newPost');
+        blog.POSTS.addPost(req.body.title, req.body.content);
+        res.redirect('/profile/newPost');
     });
 
     router.post('/login', passport.authenticate('local', {

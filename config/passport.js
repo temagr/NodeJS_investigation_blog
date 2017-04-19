@@ -1,7 +1,8 @@
 const LocalStrategy = require('passport-local').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy,
-    User = require('../models/user.model'),
-    configAuth = require('./auth');
+    Model = require('../models/blog.model'),
+    configAuth = require('./auth'),
+    DB = require('./constants');
 
 module.exports = function(passport) {
 
@@ -14,16 +15,16 @@ module.exports = function(passport) {
     });
 
     passport.use('local', new LocalStrategy((username, password, done) => {
-        User.getUserInfoByCredentials(username, password).spread((result, metadata) => {
+        Model.USERS.getUserByCredentials(username, password).spread((result, metadata) => {
             if (result.length === 1) {
                 global.User = {
-                    id: result[0].userId,
-                    name: result[0].Name,
-                    password: result[0].password
+                    id: result[0][`${DB.columns.BLOG.USERS.USER_ID}`],
+                    name: result[0][`${DB.columns.BLOG.USERS.NAME}`],
+                    password: result[0][`${DB.columns.BLOG.USERS.PASSWORD}`]
                 };
                 return done(null, {
-                    userId: result[0].userId,
-                    username: result[0].Name
+                    userId: result[0][`${DB.columns.BLOG.USERS.USER_ID}`],
+                    username: result[0][`${DB.columns.BLOG.USERS.NAME}`]
                 });
             } else {
                 return done(null, false);
@@ -37,14 +38,14 @@ module.exports = function(passport) {
         callbackURL: configAuth.facebookAuth.callbackURL
     }, (token, refreshToken, profile, done) => {
         process.nextTick(() => {
-            User.getUserByFacebookId(profile.id).spread((result, metadata) => {
+            Model.USERS.getUserByFacebookId(profile.id).spread((result, metadata) => {
                 if (result.length === 1) {
                     return done(null, {
                         userId: result[0].userId,
                         username: result[0].username
                     });
                 } else {
-                    User.addNewFacebookUser(profile.id);
+                    Model.USERS.addNewFacebookUser(profile.id);
                     return done(null, {facebookId: profile.id});
                 }
             })

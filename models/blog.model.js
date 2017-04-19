@@ -5,9 +5,13 @@ const dataBase = require('../database/database')(DB.BLOG, 'admin', '123456', {
         port: 1543,
         dialect: 'mssql'
     }),
-    user = {};
+    blog = {
+      USERS:{},
+      POSTS:{},
+      COMMENTS:{}
+    };
 
-user.getUserInfoByCredentials = (username,password) =>{
+blog.USERS.getUserByCredentials = (username,password) =>{
   return dataBase(
             `SELECT ${DB.columns.BLOG.USERS.USER_ID},
                     ${DB.columns.BLOG.USERS.NAME},
@@ -19,12 +23,22 @@ user.getUserInfoByCredentials = (username,password) =>{
           );
 }
 
-// user.getUserByFacebookId = (id) => {
+blog.POSTS.addPost = (title,content) => {
+  dataBase(`INSERT INTO [${DB.tables.BLOG.POSTS}] (${DB.columns.BLOG.POSTS.TITLE},
+               [${DB.columns.BLOG.POSTS.DATE}],
+               ${DB.columns.BLOG.POSTS.OWNER_ID})
+            VALUES (
+               '${title}',
+               GETDATE(),
+               ${global.User.id})`);
+}
+
+module.exports = blog;
+
+// blog.USERS.getUserByFacebookId = (id) => {
 //   return dataBase(`SELECT userID,Name, facebookId FROM Users WHERE facebookId='${id}'`);
 // }
-
-// user.addNewFacebookUser = (facebookId) => {
+//
+// blog.USERS.addNewFacebookUser = (facebookId) => {
 //   dataBase(`INSERT INTO Users (facebookId) VALUES (${facebookId})`);
 // }
-
-module.exports = user;

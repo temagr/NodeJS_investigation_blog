@@ -19,14 +19,14 @@ exports.columns = {
         },
         POSTS: {
           POST_ID:'postId',
-          TITLE:'title',
-          DATE:'date',
+          TITLE:'Title',
+          DATE:'Date',
           OWNER_ID:'OwnerID'
         },
         POST_DETAILS: {
           DETAIL_ID:'detailID',
           POST_ID:'postID',
-          CONTENT:'Content'
+          CONTENT:'PostBody'
         },
         COMMENTS: {
           COMMENT_ID:'commentID',

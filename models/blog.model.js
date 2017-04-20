@@ -24,13 +24,25 @@ blog.USERS.getUserByCredentials = (username,password) =>{
 }
 
 blog.POSTS.addPost = (title,content) => {
-  dataBase(`INSERT INTO [${DB.tables.BLOG.POSTS}] (${DB.columns.BLOG.POSTS.TITLE},
-               [${DB.columns.BLOG.POSTS.DATE}],
-               ${DB.columns.BLOG.POSTS.OWNER_ID})
-            VALUES (
-               '${title}',
-               GETDATE(),
-               ${global.User.id})`);
+  dataBase(`DECLARE @TranName VARCHAR(20);
+            SELECT @TranName = 'AddPost';
+            BEGIN TRANSACTION @TranName
+                DECLARE @CurrentPostID int;
+                INSERT INTO [${DB.tables.BLOG.POSTS}] (${DB.columns.BLOG.POSTS.TITLE},
+                   [${DB.columns.BLOG.POSTS.DATE}],
+                   ${DB.columns.BLOG.POSTS.OWNER_ID})
+                VALUES (
+                   '${title}',
+                   GETDATE(),
+                   ${global.User.id});
+                SELECT @CurrentPostID = SCOPE_IDENTITY();
+                INSERT INTO [${DB.tables.BLOG.POST_DETAILS}] (${DB.columns.BLOG.POST_DETAILS.POST_ID},
+                   ${DB.columns.BLOG.POST_DETAILS.CONTENT})
+                VALUES (
+                  @CurrentPostID,
+                  '${content}'
+                );
+            COMMIT TRANSACTION @TranName`);
 }
 
 module.exports = blog;

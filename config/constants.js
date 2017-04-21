@@ -37,3 +37,5 @@ exports.columns = {
         }
     }
 }
+
+exports.POST_NUMBER = 20;

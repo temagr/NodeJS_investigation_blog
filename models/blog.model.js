@@ -45,6 +45,13 @@ blog.POSTS.addPost = (title,content) => {
             COMMIT TRANSACTION @TranName`);
 }
 
+blog.POSTS.getLatestPosts = () => {
+  return dataBase(`
+    SELECT TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE}
+    FROM ${DB.tables.BLOG.POSTS}
+    ORDER BY ${DB.columns.BLOG.POSTS.DATE} DESC`);
+}
+
 module.exports = blog;
 
 // blog.USERS.getUserByFacebookId = (id) => {

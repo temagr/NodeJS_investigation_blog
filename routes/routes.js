@@ -13,7 +13,9 @@ module.exports = function(passport) {
     })
 
     router.get('/profile', (req, res) => {
-        res.render('profile');
+        blog.POSTS.getLatestPosts(10).spread((result, metadata) => {
+            res.render('profile', {postCollection: result});
+        })
     });
 
     router.get('/profile/newPost', (req, res) => {
@@ -31,7 +33,7 @@ module.exports = function(passport) {
         failureRedirect: '/'
     }));
 
-    router.get('/login/facebook', passport.authenticate('facebook',{ scope : 'email' }));
+    router.get('/login/facebook', passport.authenticate('facebook', {scope: 'email'}));
 
     router.get('/login/facebook/callback', passport.authenticate('facebook', {
         successRedirect: '/profile',

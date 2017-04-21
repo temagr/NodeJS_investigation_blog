@@ -12,7 +12,14 @@ html(lang="en")
           span.fa.fa-anchor Profile page
         a.btn.btn-default.btn-sm(href="/logout") Logout
       .jumbotron
-        h1 Hello, #{global.User.name}!
-        p Welcome to your Blog
+        h2 Hello, #{global.User.name}!
+        h2 Welcome to your Blog
+        .row
+          .col-xs-7
+              p Latest posts:
+              .list-group
+                each val in postCollection
+                  a.list-group-item
+                    h4.list-group-item-heading= val.Title
         p
           a.btn.btn-primary.btn-lg(href="/profile/newPost") Add new post

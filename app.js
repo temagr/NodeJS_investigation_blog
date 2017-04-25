@@ -24,6 +24,11 @@ app.use(cookieParser());
 app.use(session({secret: 'keyboard cat', resave: true, saveUninitialized: true, cookie: {}}));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/', routes);
+app.use('/', routes)
+// define if we want run unit tests by URL with ?test=1
+app.use(function(req, res, next) {
+    res.locals.runUnitTests = (req.query.test === '1');
+    next();
+});
 
 module.exports = app;

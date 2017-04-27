@@ -1,8 +1,10 @@
 html(lang="en")
   head
-    title Login form
+    title New Post
     link(rel="stylesheet",href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
     link(rel="stylesheet",href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
+    if (process.env.NODE_ENV === 'development')
+      link(rel="stylesheet", href="/tests/vendor/mocha.css")
     style.
       body{ padding-top:80px; }
   body
@@ -20,7 +22,13 @@ html(lang="en")
                   Content
                 textarea#content.form-control(type="text",placeholder="Type content here",rows="10",name="content")
               .form-group.row
-              button.btn.btn-success.btn-lg(type="submit").
-                  Submit
+              button.btn.btn-success.btn-lg(type="submit") Submit
+    if (process.env.NODE_ENV === 'development')
+        #mocha.col-sm-12
+    if (process.env.NODE_ENV === 'development')
+      script(src="/tests/vendor/mocha.js")
+      script(src="/tests/vendor/chai.js")
+      script(src="/tests/tests-newPost.js")
+      script mocha.run();
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js")
     script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")

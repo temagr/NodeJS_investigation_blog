@@ -13,7 +13,7 @@ module.exports = function(passport) {
     })
 
     router.get('/profile', (req, res) => {
-        blog.POSTS.getLatestPosts(10).spread((result, metadata) => {
+        blog.POSTS.getLatestPosts().spread((result, metadata) => {
             res.render('profile', {postCollection: result});
         })
     });
@@ -24,7 +24,7 @@ module.exports = function(passport) {
 
     router.post('/profile/newPost', (req, res) => {
         blog.POSTS.addPost(req.body.title, req.body.content);
-        res.redirect('/profile/newPost');
+        res.redirect('/profile');
     });
 
     router.post('/login', passport.authenticate('local', {

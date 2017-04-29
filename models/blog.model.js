@@ -60,11 +60,21 @@ blog.POSTS.getPostById = (id) => {
       and ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} = ${id}`);
 }
 
-blog.POSTS.getCommentsForPostByDetailId = (id) => {
+blog.COMMENTS.getCommentsForPostByDetailId = (id) => {
   return dataBase(`
       SELECT ${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}, ${DB.columns.BLOG.COMMENTS.DATE}
       FROM ${DB.tables.BLOG.COMMENTS}
       WHERE ${DB.tables.BLOG.COMMENTS}.${DB.columns.BLOG.COMMENTS.POST_DETAIL_ID} = ${id}`);
+}
+
+blog.COMMENTS.addComment = (comment, ownerId, detailId) => {
+  console.log(comment, ownerId, detailId);
+  return dataBase(`
+      INSERT INTO ${DB.tables.BLOG.COMMENTS} (${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT},
+       ${DB.columns.BLOG.COMMENTS.DATE},
+       ${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID},
+       ${DB.columns.BLOG.COMMENTS.POST_DETAIL_ID})
+      VALUES ('${comment}', GETDATE(),${ownerId},${detailId})`);
 }
 
 module.exports = blog;

@@ -19,20 +19,23 @@ module.exports = function(passport) {
     });
 
     router.get('/profile/post/:id', (req, res) => {
-      blog.POSTS.getPostById(req.params.id)
-                .spread((result,metadata) => {
-                  // TODO check for single post
-                  let post = result[0];
-                  blog.POSTS.getCommentsForPostByDetailId(post.detailID)
-                            .spread((result,metadata) => {
-                                console.log(result);
-                                res.render('post', {
-                                  currentPost: post,
-                                  postComments:result
-                                });
-                            });
-                })
+        blog.POSTS.getPostById(req.params.id).spread((result, metadata) => {
+            // TODO check for single post
+            let post = result[0];
+            post.id = req.params.id;
+            blog.COMMENTS.getCommentsForPostByDetailId(post.detailID).spread((result, metadata) => {
+                res.render('post', {
+                    currentPost: post,
+                    postComments: result
+                });
+            });
+        })
     });
+
+    router.post('/profile/post/:id/newComment', (req, res) => {
+        blog.COMMENTS.addComment(req.body.comment, req.query.ownerId, req.query.detailId);
+        res.redirect('.');
+    })
 
     router.get('/profile/newPost', (req, res) => {
         res.render('newPost');

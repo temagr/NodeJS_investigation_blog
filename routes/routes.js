@@ -18,6 +18,12 @@ module.exports = function(passport) {
         })
     });
 
+    router.get('/profile/post/:id', (req, res) => {
+      blog.POSTS.getPostById(req.params.id).spread((result,metadata) => {
+        res.render('post', {currentPost: result[0]});
+      })
+    });
+
     router.get('/profile/newPost', (req, res) => {
         res.render('newPost');
     });

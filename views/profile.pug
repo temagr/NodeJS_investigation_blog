@@ -21,7 +21,7 @@ html(lang="en")
               p Latest posts:
               .list-group
                 each val in postCollection
-                  a.list-group-item
+                  a.list-group-item(href="/profile/post/" + val.postId) 
                     h4.list-group-item-heading= val.Title
         p
           a.btn.btn-primary.btn-lg(href="/profile/newPost") Add new post

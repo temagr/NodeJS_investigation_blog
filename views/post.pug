@@ -1,0 +1,24 @@
+html(lang="en")
+  head
+    title Profile
+    link(rel="stylesheet",href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
+    link(rel="stylesheet",href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
+    if (process.env.NODE_ENV === 'development')
+      link(rel="stylesheet", href="/tests/vendor/mocha.css")
+    style.
+      body{ padding-top:80px;  word-wrap:break-word;}
+  body
+    .container
+      .page-header.text-center 
+        h1 #{currentPost.Title} 
+          small #{currentPost.Date.toDateString()}
+      .jumbotron
+        p #{currentPost.PostBody}
+      //- if (process.env.NODE_ENV === 'development')
+      //-     #mocha.col-sm-12
+  //- if (process.env.NODE_ENV === 'development')
+  //-   script(src="/tests/vendor/mocha.js")
+  //-   script(src="/tests/vendor/chai.js")
+  //-   script(src="/tests/tests-profile.js")
+  //-   script mocha.run();
+  

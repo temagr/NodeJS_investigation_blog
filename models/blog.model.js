@@ -47,9 +47,17 @@ blog.POSTS.addPost = (title,content) => {
 
 blog.POSTS.getLatestPosts = () => {
   return dataBase(`
-    SELECT TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE}
+    SELECT TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.POST_ID}
     FROM ${DB.tables.BLOG.POSTS}
     ORDER BY ${DB.columns.BLOG.POSTS.DATE} DESC`);
+}
+
+blog.POSTS.getPostById = (id) => {
+  return dataBase(`
+      SELECT ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT}
+      FROM ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.POST_DETAILS}
+      WHERE ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.POST_ID} = ${id}
+      and ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} = ${id}`);
 }
 
 module.exports = blog;

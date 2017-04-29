@@ -14,6 +14,10 @@ html(lang="en")
           small #{currentPost.Date.toDateString()}
       .jumbotron
         p #{currentPost.PostBody}
+      each comment in postComments
+        .panel.panel-default
+          .panel-body #{comment.commentContent}
+          .panel-footer #{comment.Date.toDateString()}
       //- if (process.env.NODE_ENV === 'development')
       //-     #mocha.col-sm-12
   //- if (process.env.NODE_ENV === 'development')

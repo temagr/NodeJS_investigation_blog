@@ -54,10 +54,17 @@ blog.POSTS.getLatestPosts = () => {
 
 blog.POSTS.getPostById = (id) => {
   return dataBase(`
-      SELECT ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT}
+      SELECT ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT}, ${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}
       FROM ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.POST_DETAILS}
       WHERE ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.POST_ID} = ${id}
       and ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} = ${id}`);
+}
+
+blog.POSTS.getCommentsForPostByDetailId = (id) => {
+  return dataBase(`
+      SELECT ${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}, ${DB.columns.BLOG.COMMENTS.DATE}
+      FROM ${DB.tables.BLOG.COMMENTS}
+      WHERE ${DB.tables.BLOG.COMMENTS}.${DB.columns.BLOG.COMMENTS.POST_DETAIL_ID} = ${id}`);
 }
 
 module.exports = blog;

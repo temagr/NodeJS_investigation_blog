@@ -19,9 +19,19 @@ module.exports = function(passport) {
     });
 
     router.get('/profile/post/:id', (req, res) => {
-      blog.POSTS.getPostById(req.params.id).spread((result,metadata) => {
-        res.render('post', {currentPost: result[0]});
-      })
+      blog.POSTS.getPostById(req.params.id)
+                .spread((result,metadata) => {
+                  // TODO check for single post
+                  let post = result[0];
+                  blog.POSTS.getCommentsForPostByDetailId(post.detailID)
+                            .spread((result,metadata) => {
+                                console.log(result);
+                                res.render('post', {
+                                  currentPost: post,
+                                  postComments:result
+                                });
+                            });
+                })
     });
 
     router.get('/profile/newPost', (req, res) => {

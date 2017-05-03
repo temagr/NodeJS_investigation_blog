@@ -17,12 +17,18 @@ html(lang="en")
         h2 Hello, #{global.User.name}!
         h2 Welcome to your Blog
         .row
-          .col-xs-7
-              p Latest posts:
+          .col-xs-6
+              p My posts:
               .list-group
-                each val in postCollection
+                each val in myPostsCollection
                   a.list-group-item(href="/profile/post/" + val.postId) 
                     h4.list-group-item-heading= val.Title
+          .col-xs-6
+              p Other users' posts:
+              .list-group
+                each val in otherPostsCollection
+                  a.list-group-item(href="/profile/post/" + val.postId) 
+                    h4.list-group-item-heading= val.Title + ' by ' + val.Name
         p
           a.btn.btn-primary.btn-lg(href="/profile/newPost") Add new post
       if (process.env.NODE_ENV === 'development')

@@ -45,26 +45,37 @@ blog.POSTS.addPost = (title,content) => {
             COMMIT TRANSACTION @TranName`);
 }
 
-blog.POSTS.getLatestPosts = () => {
+blog.POSTS.getCurrentUserLatestPosts = () => {
   return dataBase(`
     SELECT TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.POST_ID}
     FROM ${DB.tables.BLOG.POSTS}
+    WHERE ${DB.columns.BLOG.POSTS.OWNER_ID} = ${global.User.id}
+    ORDER BY ${DB.columns.BLOG.POSTS.DATE} DESC`);
+}
+
+blog.POSTS.getOtherUsersLatestPosts = () => {
+  return dataBase(`
+    SELECT TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.POST_ID}
+    FROM ${DB.tables.BLOG.POSTS}
+    WHERE ${DB.columns.BLOG.POSTS.OWNER_ID} <> ${global.User.id}
     ORDER BY ${DB.columns.BLOG.POSTS.DATE} DESC`);
 }
 
 blog.POSTS.getPostById = (id) => {
   return dataBase(`
-      SELECT ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT}, ${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}
-      FROM ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.POST_DETAILS}
+      SELECT ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT}, ${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}, ${DB.columns.BLOG.USERS.NAME}
+      FROM ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.POST_DETAILS}, ${DB.tables.BLOG.USERS}
       WHERE ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.POST_ID} = ${id}
-      and ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} = ${id}`);
+      and ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} = ${id}
+      and ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.OWNER_ID} = ${DB.columns.BLOG.USERS.USER_ID}`);
 }
 
 blog.COMMENTS.getCommentsForPostByDetailId = (id) => {
   return dataBase(`
-      SELECT ${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}, ${DB.columns.BLOG.COMMENTS.DATE}
-      FROM ${DB.tables.BLOG.COMMENTS}
-      WHERE ${DB.tables.BLOG.COMMENTS}.${DB.columns.BLOG.COMMENTS.POST_DETAIL_ID} = ${id}`);
+      SELECT ${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}, ${DB.columns.BLOG.COMMENTS.DATE}, ${DB.columns.BLOG.USERS.NAME}
+      FROM ${DB.tables.BLOG.COMMENTS}, ${DB.tables.BLOG.USERS}
+      WHERE ${DB.tables.BLOG.COMMENTS}.${DB.columns.BLOG.COMMENTS.POST_DETAIL_ID} = ${id}
+      and ${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID} = ${DB.columns.BLOG.USERS.USER_ID}`);
 }
 
 blog.COMMENTS.addComment = (comment, ownerId, detailId) => {

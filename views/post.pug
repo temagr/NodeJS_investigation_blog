@@ -11,13 +11,19 @@ html(lang="en")
     .container
       .page-header.text-center 
         h1 #{currentPost.Title} 
-          small #{currentPost.Date.toDateString()}
+          small
+            | by 
+            strong #{currentPost.Name} 
+            | on #{currentPost.Date.toDateString()} 
       .jumbotron
         p #{currentPost.PostBody}
       each comment in postComments
         .panel.panel-default
           .panel-body #{comment.commentContent}
-          .panel-footer #{comment.Date.toDateString()}
+          .panel-footer 
+            | #{comment.Date.toDateString()}
+            | by 
+            strong #{comment.Name}
       form(action="/profile/post/"+currentPost.id+"/newComment?ownerId="+global.User.id+"&detailId="+currentPost.detailID,method="POST")
           .form-group
             

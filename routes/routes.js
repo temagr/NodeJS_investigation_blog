@@ -13,7 +13,7 @@ module.exports = function(passport) {
     })
 
     router.get('/profile', (req, res) => {
-        blog.POSTS.getLatestPosts().spread((result, metadata) => {
+        blog.POSTS.getOtherUsersLatestPosts().spread((result, metadata) => {
             res.render('profile', {postCollection: result});
         })
     });
@@ -24,6 +24,7 @@ module.exports = function(passport) {
             let post = result[0];
             post.id = req.params.id;
             blog.COMMENTS.getCommentsForPostByDetailId(post.detailID).spread((result, metadata) => {
+                console.log(result);
                 res.render('post', {
                     currentPost: post,
                     postComments: result

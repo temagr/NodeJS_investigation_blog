@@ -1,29 +1,28 @@
 const DB = require('../config/constants');
 
 const dataBase = require('../database/database')(DB.BLOG, 'admin', '123456', {
-        host: 'RUKAVITSINI',
-        port: 1543,
-        dialect: 'mssql'
-    }),
-    blog = {
-      USERS:{},
-      POSTS:{},
-      COMMENTS:{}
-    };
+    host: 'RUKAVITSINI',
+    port: 1543,
+    dialect: 'mssql'
+  }),
+  blog = {
+    USERS: {},
+    POSTS: {},
+    COMMENTS: {},
+    RATES: {}
+  };
 
-blog.USERS.getUserByCredentials = (username,password) =>{
-  return dataBase(
-            `SELECT ${DB.columns.BLOG.USERS.USER_ID},
+blog.USERS.getUserByCredentials = (username, password) => {
+  return dataBase(`SELECT ${DB.columns.BLOG.USERS.USER_ID},
                     ${DB.columns.BLOG.USERS.NAME},
                     ${DB.columns.BLOG.USERS.EMAIL},
                     ${DB.columns.BLOG.USERS.PASSWORD}
             FROM ${DB.tables.BLOG.USERS}
             WHERE ${DB.columns.BLOG.USERS.NAME}='${username}'
-                  and ${DB.columns.BLOG.USERS.PASSWORD}='${password}'`
-          );
+                  and ${DB.columns.BLOG.USERS.PASSWORD}='${password}'`);
 }
 
-blog.POSTS.addPost = (title,content) => {
+blog.POSTS.addPost = (title, content) => {
   dataBase(`DECLARE @TranName VARCHAR(20);
             SELECT @TranName = 'AddPost';
             BEGIN TRANSACTION @TranName
@@ -80,7 +79,6 @@ blog.COMMENTS.getCommentsForPostByDetailId = (id) => {
 }
 
 blog.COMMENTS.addComment = (comment, ownerId, detailId) => {
-  console.log(comment, ownerId, detailId);
   return dataBase(`
       INSERT INTO ${DB.tables.BLOG.COMMENTS} (${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT},
        ${DB.columns.BLOG.COMMENTS.DATE},
@@ -89,12 +87,26 @@ blog.COMMENTS.addComment = (comment, ownerId, detailId) => {
       VALUES ('${comment}', GETDATE(),${ownerId},${detailId})`);
 }
 
+blog.RATES.setRate = (rate, postId, userId) => {
+  return dataBase(`
+    INSERT INTO ${DB.tables.BLOG.RATES} (${DB.columns.BLOG.RATES.RATE},
+    ${DB.columns.BLOG.RATES.POST_ID},
+    ${DB.columns.BLOG.RATES.USER_ID})
+    VALUES (${rate},${postId},${userId})`);
+}
+
+blog.RATES.getCurrentUsersRate = (postId, userId) => {
+  return dataBase(`
+    SELECT ${DB.columns.BLOG.RATES.RATE}
+    FROM ${DB.tables.BLOG.RATES}
+    WHERE ${DB.tables.BLOG.RATES}.${DB.columns.BLOG.RATES.POST_ID} = ${postId}
+    and ${DB.tables.BLOG.RATES}.${DB.columns.BLOG.RATES.USER_ID} = ${userId}`);
+}
+
 module.exports = blog;
 
-// blog.USERS.getUserByFacebookId = (id) => {
-//   return dataBase(`SELECT userID,Name, facebookId FROM Users WHERE facebookId='${id}'`);
-// }
+// blog.USERS.getUserByFacebookId = (id) => {   return dataBase(`SELECT
+// userID,Name, facebookId FROM Users WHERE facebookId='${id}'`); }
 //
-// blog.USERS.addNewFacebookUser = (facebookId) => {
-//   dataBase(`INSERT INTO Users (facebookId) VALUES (${facebookId})`);
-// }
+// blog.USERS.addNewFacebookUser = (facebookId) => {   dataBase(`INSERT INTO
+// Users (facebookId) VALUES (${facebookId})`); }

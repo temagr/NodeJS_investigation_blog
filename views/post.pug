@@ -3,6 +3,7 @@ html(lang="en")
     title Profile
     link(rel="stylesheet",href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
     link(rel="stylesheet",href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
+    link(rel="stylesheet",href="/css/main.css")
     if (process.env.NODE_ENV === 'development')
       link(rel="stylesheet", href="/tests/vendor/mocha.css")
     style.
@@ -14,7 +15,37 @@ html(lang="en")
           small
             | by 
             strong #{currentPost.Name} 
-            | on #{currentPost.Date.toDateString()} 
+            | on #{currentPost.Date.toDateString()}
+      .row
+        if (!currentPost.currentUsersRate)
+          .col-xs-10
+            form.form-inline(action="/profile/post/"+currentPost.id+"/rate?ownerId="+global.User.id,method="POST")
+              fieldset.rating
+                input(type="radio",id="star5", name="rating", value="5")
+                label.full(for="star5")
+                input(type="radio",id="star4half", name="rating", value="4.5")
+                label.half(for="star4half")
+                input(type="radio",id="star4", name="rating", value="4")
+                label.full(for="star4")
+                input(type="radio",id="star3half", name="rating", value="3.5")
+                label.half(for="star3half")
+                input(type="radio",id="star3", name="rating", value="3")
+                label.full(for="star3")
+                input(type="radio",id="star2half", name="rating", value="2.5")
+                label.half(for="star2half")
+                input(type="radio",id="star2", name="rating", value="2")
+                label.full(for="star2")
+                input(type="radio",id="star1half", name="rating", value="1.5")
+                label.half(for="star1half")
+                input(type="radio",id="star1", name="rating", value="1")
+                label.full(for="star1")
+                input(type="radio",id="starhalf", name="rating", value="0.5")
+                label.half(for="starhalf")
+                input(type="radio",id="star0", name="rating", value="0",checked="")
+              button.btn.btn-info.btn-sm(type="submit")
+                | Set rating
+        .col-xs-2.text-right
+          | All in all rating
       .jumbotron
         p #{currentPost.PostBody}
       each comment in postComments

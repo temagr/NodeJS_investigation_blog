@@ -24,7 +24,7 @@ module.exports = function (passport) {
                     .spread((posts, metadata) => {
                         res.render('profile', {
                             myPostsCollection: posts,
-                            otherPostsCollection:result
+                            otherPostsCollection: result
                         });
                     })
             })
@@ -39,15 +39,20 @@ module.exports = function (passport) {
                 let post = result[0];
                 post.id = req.params.id;
                 blog
-                    .COMMENTS
-                    .getCommentsForPostByDetailId(post.detailID)
+                    .RATES
+                    .getCurrentUsersRate(post.id, req.query.userId)
                     .spread((result, metadata) => {
-                        console.log(result);
-                        res.render('post', {
-                            currentPost: post,
-                            postComments: result
-                        });
-                    });
+                        post.currentUsersRate = !!result.length;
+                        blog
+                            .COMMENTS
+                            .getCommentsForPostByDetailId(post.detailID)
+                            .spread((result, metadata) => {
+                                res.render('post', {
+                                    currentPost: post,
+                                    postComments: result
+                                });
+                            });
+                    })
             })
     });
 
@@ -56,6 +61,13 @@ module.exports = function (passport) {
             .COMMENTS
             .addComment(req.body.comment, req.query.ownerId, req.query.detailId);
         res.redirect('.');
+    })
+
+    router.post('/profile/post/:id/rate', (req, res) => {
+        blog
+            .RATES
+            .setRate(req.body.rating, req.params.id, req.query.ownerId);
+        res.redirect('../' + req.params.id + '?userId=' +global.User.id);
     })
 
     router.get('/profile/newPost', (req, res) => {

@@ -21,13 +21,13 @@ html(lang="en")
               p My posts:
               .list-group
                 each val in myPostsCollection
-                  a.list-group-item(href="/profile/post/" + val.postId) 
+                  a.list-group-item(href="/profile/post/" + val.postId + "?userId="+global.User.id) 
                     h4.list-group-item-heading= val.Title
           .col-xs-6
               p Other users' posts:
               .list-group
                 each val in otherPostsCollection
-                  a.list-group-item(href="/profile/post/" + val.postId) 
+                  a.list-group-item(href="/profile/post/" + val.postId + "?userId="+global.User.id) 
                     h4.list-group-item-heading= val.Title + ' by ' + val.Name
         p
           a.btn.btn-primary.btn-lg(href="/profile/newPost") Add new post

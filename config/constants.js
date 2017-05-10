@@ -5,7 +5,8 @@ exports.tables = {
         USERS: "Users",
         POSTS: "Posts",
         POST_DETAILS: "PostDetails",
-        COMMENTS: "Comments"
+        COMMENTS: "Comments",
+        RATES: "Rates"
     }
 }
 
@@ -34,6 +35,12 @@ exports.columns = {
           DATE:'Date',
           COMMENT_OWNER_ID:'commentOwnerID',
           POST_DETAIL_ID:'postDetailId'
+        },
+        RATES:{
+          RATE_ID:"rateID",
+          POST_ID:"postID",
+          USER_ID:"userID",
+          RATE:"rate"
         }
     }
 }

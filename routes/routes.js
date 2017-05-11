@@ -17,7 +17,6 @@ module.exports = function (passport) {
             .POSTS
             .getOtherUsersLatestPosts()
             .spread((result, metadata) => {
-                console.log(result);
                 blog
                     .POSTS
                     .getCurrentUserLatestPosts()
@@ -65,10 +64,16 @@ module.exports = function (passport) {
 
     router.post('/profile/post/:id/rate', (req, res) => {
         blog
-            .RATES
-            .setRate(req.body.rating, req.params.id, req.query.ownerId);
-        res.redirect('../' + req.params.id + '?userId=' +global.User.id);
+            .POSTS
+            .getAllPostsInfo()
+            .spread((result, metadata) => {
+                console.log("JOIN", result);
+            });
     })
+
+    // router.post('/profile/post/:id/rate', (req, res) => {     blog         .RATES
+    //         .setRate(req.body.rating, req.params.id, req.query.ownerId);
+    // res.redirect('../' + req.params.id + '?userId=' +global.User.id); })
 
     router.get('/profile/newPost', (req, res) => {
         res.render('newPost');

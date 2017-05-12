@@ -77,6 +77,7 @@ blog.POSTS.getAllPostsInfo = () => {
            P.[${DB.columns.BLOG.POSTS.DATE}] as postCreationDate,
            PD.[${DB.columns.BLOG.POST_DETAILS.CONTENT}] as postContent,
            U1.[${DB.columns.BLOG.USERS.NAME}] as postAuthor,
+           U1.[${DB.columns.BLOG.USERS.USER_ID}] as postAuthorId,
            C.[${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}] as postCommentContent,
            C.[${DB.columns.BLOG.COMMENTS.DATE}] as postCommentCreationDate,
            C.[${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID}] as postCommentAuthorId,

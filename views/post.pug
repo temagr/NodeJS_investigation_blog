@@ -44,8 +44,11 @@ html(lang="en")
                 input(type="radio",id="star0", name="rating", value="0",checked="")
               button.btn.btn-info.btn-sm(type="submit")
                 | Set rating
-        .col-xs-2.text-right
-          | All in all rating
+        if (!!currentPost.averageRate)
+          .col-xs-2.text-right= currentPost.averageRate
+        else
+          .col-xs-2.text-right
+            | All in all rating
       .jumbotron
         p #{currentPost.PostBody}
       each comment in postComments

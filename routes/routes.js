@@ -1,6 +1,7 @@
 const express = require('express'),
     router = express.Router(),
-    blog = require('../models/blog.model');
+    blog = require('../models/blog.model'),
+    posts = require('../models/post.model');
 
 module.exports = function (passport) {
 
@@ -15,44 +16,42 @@ module.exports = function (passport) {
     router.get('/profile', (req, res) => {
         blog
             .POSTS
-            .getOtherUsersLatestPosts()
+            .getAllPostsInfo()
             .spread((result, metadata) => {
-                blog
-                    .POSTS
-                    .getCurrentUserLatestPosts()
-                    .spread((posts, metadata) => {
-                        res.render('profile', {
-                            myPostsCollection: posts,
-                            otherPostsCollection: result
-                        });
-                    })
+                let responseOptions = {
+                    myPostsCollection: posts.getCurrentUsersPosts(result),
+                    otherPostsCollection: posts.getOtherUsersPosts(result)
+                };
+                res.render('profile', responseOptions);
             })
     });
 
     router.get('/profile/post/:id', (req, res) => {
         blog
             .POSTS
-            .getPostById(req.params.id)
+            .getAllPostsInfo()
             .spread((result, metadata) => {
-                // TODO check for single post
-                let post = result[0];
-                post.id = req.params.id;
-                blog
-                    .RATES
-                    .getCurrentUsersRate(post.id, req.query.userId)
-                    .spread((result, metadata) => {
-                        post.currentUsersRate = !!result.length;
-                        blog
-                            .COMMENTS
-                            .getCommentsForPostByDetailId(post.detailID)
-                            .spread((result, metadata) => {
-                                res.render('post', {
-                                    currentPost: post,
-                                    postComments: result
-                                });
-                            });
-                    })
+                let responseOptions = {
+                    currentPost: {
+                        currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
+                        averageRate: posts.averageRate(req.params.id, result),
+                        Title: posts.getPostTitleById(req.params.id, result),
+                        Name: posts.getPostAuthorNameByPostId(req.params.id, result),
+                        Date: post.getPostCreationDateById(req.params.id, result)
+                    }
+                };
             })
+        // blog     .POSTS     .getPostById(req.params.id)     .spread((result,
+        // metadata) => {         let post = result[0];         post.id = req.params.id;
+        //         blog             .RATES             .getCurrentUsersRate(post.id,
+        // req.query.userId)             .spread((result, metadata) => {
+        // post.currentUsersRate = !!result.length;                 blog
+        //     .COMMENTS
+        // .getCommentsForPostByDetailId(post.detailID)
+        // .spread((result, metadata) => {                         res.render('post', {
+        //                            currentPost: post,
+        // postComments: result                         });                     });
+        //        })     })
     });
 
     router.post('/profile/post/:id/newComment', (req, res) => {

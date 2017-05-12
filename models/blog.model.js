@@ -76,6 +76,7 @@ blog.POSTS.getAllPostsInfo = () => {
            P.[${DB.columns.BLOG.POSTS.TITLE}] as postTitle,
            P.[${DB.columns.BLOG.POSTS.DATE}] as postCreationDate,
            PD.[${DB.columns.BLOG.POST_DETAILS.CONTENT}] as postContent,
+           PD.[${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}] as postDetailId,
            U1.[${DB.columns.BLOG.USERS.NAME}] as postAuthor,
            U1.[${DB.columns.BLOG.USERS.USER_ID}] as postAuthorId,
            C.[${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}] as postCommentContent,
@@ -83,15 +84,16 @@ blog.POSTS.getAllPostsInfo = () => {
            C.[${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID}] as postCommentAuthorId,
            U2.[${DB.columns.BLOG.USERS.NAME}] as postCommentAuthor,
            R1.[${DB.columns.BLOG.RATES.USER_ID}] as postRatingOwnerId,
-           U3.[${DB.columns.BLOG.USERS.NAME}] as postRatingOwnerName,
-           R2.[${DB.columns.BLOG.RATES.RATE}] as postRate
+           R1.[${DB.columns.BLOG.RATES.RATE}] as postRate,
+           U3.[${DB.columns.BLOG.USERS.NAME}] as postRatingOwnerName
+           
     FROM ${DB.tables.BLOG.POSTS} P join ${DB.tables.BLOG.POST_DETAILS} PD on P.[${DB.columns.BLOG.POSTS.POST_ID}] = PD.[${DB.columns.BLOG.POST_DETAILS.POST_ID}]
                                    join ${DB.tables.BLOG.USERS} U1 on P.[${DB.columns.BLOG.POSTS.OWNER_ID}] = U1.[${DB.columns.BLOG.USERS.USER_ID}]
                                    left join ${DB.tables.BLOG.COMMENTS} C on PD.[${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}] = C.[${DB.columns.BLOG.COMMENTS.POST_DETAIL_ID}]
                                    left join ${DB.tables.BLOG.USERS} U2 on C.[${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID}] = U2.[${DB.columns.BLOG.USERS.USER_ID}]
                                    left join ${DB.tables.BLOG.RATES} R1 on P.[${DB.columns.BLOG.POSTS.POST_ID}] = R1.[${DB.columns.BLOG.RATES.POST_ID}]
-                                   left join ${DB.tables.BLOG.USERS} U3 on R1.[${DB.columns.BLOG.RATES.USER_ID}] = U3.[${DB.columns.BLOG.USERS.USER_ID}]
-                                   left join ${DB.tables.BLOG.RATES} R2 on R2.[${DB.columns.BLOG.RATES.POST_ID}] = P.[${DB.columns.BLOG.POSTS.POST_ID}]`);
+                                   left join ${DB.tables.BLOG.USERS} U3 on R1.[${DB.columns.BLOG.RATES.USER_ID}] = U3.[${DB.columns.BLOG.USERS.USER_ID}]`);
+                                   
 }
 
 blog.COMMENTS.getCommentsForPostByDetailId = (id) => {

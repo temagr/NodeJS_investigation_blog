@@ -1,7 +1,8 @@
 const express = require('express'),
     router = express.Router(),
     blog = require('../models/blog.model'),
-    posts = require('../models/post.model');
+    posts = require('../models/post.model'),
+    {POST_MODEL} = require('../config/constants');
 
 module.exports = function (passport) {
 
@@ -31,48 +32,45 @@ module.exports = function (passport) {
             .POSTS
             .getAllPostsInfo()
             .spread((result, metadata) => {
-                let responseOptions = {
-                    currentPost: {
-                        currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
-                        averageRate: posts.averageRate(req.params.id, result),
-                        Title: posts.getPostTitleById(req.params.id, result),
-                        Name: posts.getPostAuthorNameByPostId(req.params.id, result),
-                        Date: post.getPostCreationDateById(req.params.id, result)
-                    }
-                };
+                let postInfo = posts.getPostInfoById(req.params.id, result),
+                    responseOptions = {
+                        currentPost: {
+                            id: req.params.id,
+                            currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
+                            averageRate: posts.getAverageRate(req.params.id, result),
+                            Title: postInfo[POST_MODEL.POST_TITLE],
+                            Name: postInfo[POST_MODEL.POST_AUTHOR],
+                            Date: postInfo[POST_MODEL.POST_CREATION_DATE],
+                            PostBody: postInfo[POST_MODEL.POST_CONTENT],
+                            detailID:postInfo[POST_MODEL.POST_DETAIL_ID]
+                        },
+                        postComments:posts.getPostCommentsByPostId(req.params.id,result)
+                    };
+                res.render('post', responseOptions);
             })
         // blog     .POSTS     .getPostById(req.params.id)     .spread((result,
         // metadata) => {         let post = result[0];         post.id = req.params.id;
         //         blog             .RATES             .getCurrentUsersRate(post.id,
         // req.query.userId)             .spread((result, metadata) => {
-        // post.currentUsersRate = !!result.length;                 blog
-        //     .COMMENTS
-        // .getCommentsForPostByDetailId(post.detailID)
-        // .spread((result, metadata) => {                         res.render('post', {
-        //                            currentPost: post,
-        // postComments: result                         });                     });
-        //        })     })
+        // post.currentUsersRate = !!result.length;                 blog     .COMMENTS
+        // .getCommentsForPostByDetailId(post.detailID) .spread((result, metadata) => {
+        //                      res.render('post', { currentPost: post, postComments:
+        // result                         });           });        })     })
     });
 
     router.post('/profile/post/:id/newComment', (req, res) => {
         blog
             .COMMENTS
             .addComment(req.body.comment, req.query.ownerId, req.query.detailId);
-        res.redirect('.');
+        res.redirect('../' + req.params.id + '?userId=' + global.User.id);
     })
 
     router.post('/profile/post/:id/rate', (req, res) => {
         blog
-            .POSTS
-            .getAllPostsInfo()
-            .spread((result, metadata) => {
-                console.log("JOIN", result);
-            });
+            .RATES
+            .setRate(req.body.rating, req.params.id, req.query.ownerId);
+        res.redirect('../' + req.params.id + '?userId=' + global.User.id);
     })
-
-    // router.post('/profile/post/:id/rate', (req, res) => {     blog         .RATES
-    //         .setRate(req.body.rating, req.params.id, req.query.ownerId);
-    // res.redirect('../' + req.params.id + '?userId=' +global.User.id); })
 
     router.get('/profile/newPost', (req, res) => {
         res.render('newPost');

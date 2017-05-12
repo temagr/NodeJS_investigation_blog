@@ -31,56 +31,57 @@ posts.getOtherUsersPosts = (posts) => {
     return otherUsersPosts.map((item) => {
         return {
             postId: item[POST_MODEL.POST_ID],
-            Title: item[POST_MODEL.POST_TITLE]
+            Title: item[POST_MODEL.POST_TITLE],
+            Name: item[POST_MODEL.POST_AUTHOR]
         }
     })
 }
 
-post.getPostTitleById = (postId, posts) => {
-    let title = null;
-    for(let i=0; i<posts.length; i++){
-        if (posts[i][POST_MODEL.POST_ID] === postId){
-            title = posts[i][POST_MODEL.POST_TITLE];
+posts.getPostInfoById = (postId, posts) => {
+    let postInfo = {};
+    postInfo[POST_MODEL.POST_TITLE] = null;
+    postInfo[POST_MODEL.POST_AUTHOR] = null;
+    postInfo[POST_MODEL.POST_CREATION_DATE] = null;
+
+    for (let i = 0; i < posts.length; i++) {
+        if (posts[i][POST_MODEL.POST_ID] === + postId) {
+            postInfo[POST_MODEL.POST_TITLE] = posts[i][POST_MODEL.POST_TITLE];
+            postInfo[POST_MODEL.POST_AUTHOR] = posts[i][POST_MODEL.POST_AUTHOR];
+            postInfo[POST_MODEL.POST_CREATION_DATE] = posts[i][POST_MODEL.POST_CREATION_DATE];
+            postInfo[POST_MODEL.POST_CONTENT] = posts[i][POST_MODEL.POST_CONTENT];
+            postInfo[POST_MODEL.POST_DETAIL_ID] = posts[i][POST_MODEL.POST_DETAIL_ID];
             break;
         }
     }
-    return title ? title : "No title";
+    return postInfo;
 }
 
-post.getPostAuthorNameByPostId = (postId, posts) => {
-    let author = null;
-    for(let i=0; i<posts.length; i++){
-        if (posts[i][POST_MODEL.POST_ID] === postId){
-            author = posts[i][POST_MODEL.POST_AUTHOR];
-            break;
+posts.getPostCommentsByPostId = (postId, posts) => {
+    let currentPostInfo = posts.filter((item) => {
+        return (item[POST_MODEL.POST_ID] === + postId && !!item[POST_MODEL.POST_COMMENT_AUTHOR_ID]);
+    });
+
+    return currentPostInfo.map((item) => {
+        return {
+            commentContent: item[POST_MODEL.POST_COMMENT_CONTENT],
+            Date: item[POST_MODEL.POST_COMMENT_CREATION_DATE],
+            Name: item[POST_MODEL.POST_COMMENT_AUTHOR]
         }
-    }
-    return author ? author : "No author";
+    })
 }
 
-post.getPostCreationDateById = (postId, posts) => {
-    let date = null;
-    for(let i=0; i<posts.length; i++){
-        if (posts[i][POST_MODEL.POST_ID] === postId){
-            author = posts[i][POST_MODEL.POST_CREATION_DATE];
-            break;
-        }
-    }
-    return date ? date : "No dater";
-}
-
-post.isPostRatedByCurrentUser = (postId, posts) => {
+posts.isPostRatedByCurrentUser = (postId, posts) => {
     return posts.some((item) => {
-        return item[POST_MODEL.POST_ID] === postId && item[POST_MODEL.POST_RATING_OWNER_ID] === global.User.id;
+        return item[POST_MODEL.POST_ID] === + postId && item[POST_MODEL.POST_RATING_OWNER_ID] === global.User.id;
     })
 }
 
-post.getAverageRate = (postId, posts) => {
-    let cacedRatingAuthor = {},
+posts.getAverageRate = (postId, posts) => {
+    let cachedRatingAuthor = {},
         result = posts.reduce((total, current) => {
-            if (current[POST_MODEL.POST_ID] === postId && !!current[POST_MODEL.POST_RATE]) {
-                if (!cacedRatingAuthor[JSON.stringify(current[POST_MODEL.POST_RATING_OWNER_ID])]) {
-                    cacedRatingAuthor[JSON.stringify(current[POST_MODEL.POST_RATING_OWNER_ID])] = true;
+            if (current[POST_MODEL.POST_ID] === + postId && !!current[POST_MODEL.POST_RATE]) {
+                if (!cachedRatingAuthor[JSON.stringify(current[POST_MODEL.POST_RATING_OWNER_ID])]) {
+                    cachedRatingAuthor[JSON.stringify(current[POST_MODEL.POST_RATING_OWNER_ID])] = true;
                     total.summ += current[POST_MODEL.POST_RATE];
                     total.count++;
                 }
@@ -91,7 +92,9 @@ post.getAverageRate = (postId, posts) => {
             count: 0
         });
 
-        return result.count ? (result.summ/result.count) : null; 
+    return result.count
+        ? (result.summ / result.count)
+        : null;
 }
 
 module.exports = posts;

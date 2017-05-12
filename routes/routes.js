@@ -48,14 +48,6 @@ module.exports = function (passport) {
                     };
                 res.render('post', responseOptions);
             })
-        // blog     .POSTS     .getPostById(req.params.id)     .spread((result,
-        // metadata) => {         let post = result[0];         post.id = req.params.id;
-        //         blog             .RATES             .getCurrentUsersRate(post.id,
-        // req.query.userId)             .spread((result, metadata) => {
-        // post.currentUsersRate = !!result.length;                 blog     .COMMENTS
-        // .getCommentsForPostByDetailId(post.detailID) .spread((result, metadata) => {
-        //                      res.render('post', { currentPost: post, postComments:
-        // result                         });           });        })     })
     });
 
     router.post('/profile/post/:id/newComment', (req, res) => {

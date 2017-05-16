@@ -1,6 +1,8 @@
 const express = require('express'),
     router = express.Router(),
-    blog = require('../models/blog.model');
+    blog = require('../models/blog.model'),
+    posts = require('../models/post.model'),
+    {POST_MODEL} = require('../config/constants');
 
 module.exports = function (passport) {
 
@@ -15,43 +17,36 @@ module.exports = function (passport) {
     router.get('/profile', (req, res) => {
         blog
             .POSTS
-            .getOtherUsersLatestPosts()
+            .getAllPostsInfo()
             .spread((result, metadata) => {
-                blog
-                    .POSTS
-                    .getCurrentUserLatestPosts()
-                    .spread((posts, metadata) => {
-                        res.render('profile', {
-                            myPostsCollection: posts,
-                            otherPostsCollection: result
-                        });
-                    })
+                let responseOptions = {
+                    myPostsCollection: posts.getCurrentUsersPosts(result),
+                    otherPostsCollection: posts.getOtherUsersPosts(result)
+                };
+                res.render('profile', responseOptions);
             })
     });
 
     router.get('/profile/post/:id', (req, res) => {
         blog
             .POSTS
-            .getPostById(req.params.id)
+            .getAllPostsInfo()
             .spread((result, metadata) => {
-                // TODO check for single post
-                let post = result[0];
-                post.id = req.params.id;
-                blog
-                    .RATES
-                    .getCurrentUsersRate(post.id, req.query.userId)
-                    .spread((result, metadata) => {
-                        post.currentUsersRate = !!result.length;
-                        blog
-                            .COMMENTS
-                            .getCommentsForPostByDetailId(post.detailID)
-                            .spread((result, metadata) => {
-                                res.render('post', {
-                                    currentPost: post,
-                                    postComments: result
-                                });
-                            });
-                    })
+                let postInfo = posts.getPostInfoById(req.params.id, result),
+                    responseOptions = {
+                        currentPost: {
+                            id: req.params.id,
+                            currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
+                            averageRate: postInfo[POST_MODEL.POST_RATE],
+                            Title: postInfo[POST_MODEL.POST_TITLE],
+                            Name: postInfo[POST_MODEL.POST_AUTHOR],
+                            Date: postInfo[POST_MODEL.POST_CREATION_DATE],
+                            PostBody: postInfo[POST_MODEL.POST_CONTENT],
+                            detailID:postInfo[POST_MODEL.POST_DETAIL_ID]
+                        },
+                        postComments:posts.getPostCommentsByPostId(req.params.id,result)
+                    };
+                res.render('post', responseOptions);
             })
     });
 
@@ -59,21 +54,15 @@ module.exports = function (passport) {
         blog
             .COMMENTS
             .addComment(req.body.comment, req.query.ownerId, req.query.detailId);
-        res.redirect('.');
+        res.redirect('../' + req.params.id + '?userId=' + global.User.id);
     })
 
     router.post('/profile/post/:id/rate', (req, res) => {
         blog
-            .POSTS
-            .getAllPostsInfo()
-            .spread((result, metadata) => {
-                console.log("JOIN", result);
-            });
+            .RATES
+            .setRate(req.body.rating, req.params.id, req.query.ownerId);
+        res.redirect('../' + req.params.id + '?userId=' + global.User.id);
     })
-
-    // router.post('/profile/post/:id/rate', (req, res) => {     blog         .RATES
-    //         .setRate(req.body.rating, req.params.id, req.query.ownerId);
-    // res.redirect('../' + req.params.id + '?userId=' +global.User.id); })
 
     router.get('/profile/newPost', (req, res) => {
         res.render('newPost');

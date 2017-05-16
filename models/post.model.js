@@ -50,6 +50,7 @@ posts.getPostInfoById = (postId, posts) => {
             postInfo[POST_MODEL.POST_CREATION_DATE] = posts[i][POST_MODEL.POST_CREATION_DATE];
             postInfo[POST_MODEL.POST_CONTENT] = posts[i][POST_MODEL.POST_CONTENT];
             postInfo[POST_MODEL.POST_DETAIL_ID] = posts[i][POST_MODEL.POST_DETAIL_ID];
+            postInfo[POST_MODEL.POST_RATE] = posts[i][POST_MODEL.POST_RATE];
             break;
         }
     }
@@ -71,30 +72,13 @@ posts.getPostCommentsByPostId = (postId, posts) => {
 }
 
 posts.isPostRatedByCurrentUser = (postId, posts) => {
-    return posts.some((item) => {
-        return item[POST_MODEL.POST_ID] === + postId && item[POST_MODEL.POST_RATING_OWNER_ID] === global.User.id;
-    })
-}
-
-posts.getAverageRate = (postId, posts) => {
-    let cachedRatingAuthor = {},
-        result = posts.reduce((total, current) => {
-            if (current[POST_MODEL.POST_ID] === + postId && !!current[POST_MODEL.POST_RATE]) {
-                if (!cachedRatingAuthor[JSON.stringify(current[POST_MODEL.POST_RATING_OWNER_ID])]) {
-                    cachedRatingAuthor[JSON.stringify(current[POST_MODEL.POST_RATING_OWNER_ID])] = true;
-                    total.summ += current[POST_MODEL.POST_RATE];
-                    total.count++;
-                }
-            }
-            return total;
-        }, {
-            summ: 0,
-            count: 0
-        });
-
-    return result.count
-        ? (result.summ / result.count)
-        : null;
+    let isRated = null;
+    posts.forEach((item) => {
+        if (item[POST_MODEL.POST_ID] === + postId) {
+            isRated = !!item[POST_MODEL.CURRENT_USERS_RATE];
+        }
+    });
+    return isRated;
 }
 
 module.exports = posts;

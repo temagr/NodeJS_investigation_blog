@@ -52,14 +52,15 @@ exports.POST_MODEL = {
   POST_TITLE: "postTitle",
   POST_CREATION_DATE: "postCreationDate",
   POST_CONTENT: "postContent",
-  POST_DETAIL_ID:"postDetailId",
+  POST_DETAIL_ID: "postDetailId",
   POST_AUTHOR: "postAuthor",
-  POST_AUTHOR_ID:"postAuthorId",
+  POST_AUTHOR_ID: "postAuthorId",
   POST_COMMENT_CONTENT: "postCommentContent",
   POST_COMMENT_CREATION_DATE: "postCommentCreationDate",
   POST_COMMENT_AUTHOR_ID: "postCommentAuthorId",
   POST_COMMENT_AUTHOR: "postCommentAuthor",
   POST_RATING_OWNER_ID: "postRatingOwnerId",
   POST_RATING_OWNER_NAME: "postRatingOwnerName",
-  POST_RATE: "postRate"
+  POST_RATE: "postRate",
+  CURRENT_USERS_RATE: "currentUsersRate"
 }

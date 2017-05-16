@@ -37,7 +37,7 @@ module.exports = function (passport) {
                         currentPost: {
                             id: req.params.id,
                             currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
-                            averageRate: posts.getAverageRate(req.params.id, result),
+                            averageRate: postInfo[POST_MODEL.POST_RATE],
                             Title: postInfo[POST_MODEL.POST_TITLE],
                             Name: postInfo[POST_MODEL.POST_AUTHOR],
                             Date: postInfo[POST_MODEL.POST_CREATION_DATE],

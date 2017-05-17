@@ -20,7 +20,7 @@ module.exports = function (passport) {
             .POSTS
             .getAllPostsInfo()
             .spread((result, metadata) => {
-                cache.update(result);
+                cache.event.emit("update-data",result);
                 let responseOptions = {
                     myPostsCollection: posts.getCurrentUsersPosts(result),
                     otherPostsCollection: posts.getOtherUsersPosts(result)

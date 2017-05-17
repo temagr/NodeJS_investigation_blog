@@ -1,5 +1,6 @@
 const redis = require('redis'),
     client = redis.createClient(),
+    events = require('events'),
     cache = {};
 
 client.on('connect', function () {
@@ -9,13 +10,13 @@ client.on('connect', function () {
 cache.update = (data) => {
     client.set("appData", JSON.stringify(data), (err, reply) => {
         console.log("redis", reply);
-    })
+    });
+    console.log("updated");
 }
 
-// cache.getInfo = (key) => {
-//     let result;
-//     client.get("appData", (err,reply) => {
-//     })
-// }
+cache.event = new events.EventEmitter();
+cache
+    .event
+    .on('update-data', cache.update);
 
 module.exports = cache;

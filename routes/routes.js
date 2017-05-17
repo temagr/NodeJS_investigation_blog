@@ -2,8 +2,7 @@ const express = require('express'),
     router = express.Router(),
     blog = require('../models/blog.model'),
     posts = require('../models/post.model'),
-    cache = require('../config/cache.js'),
-    {POST_MODEL} = require('../config/constants');
+    cache = require('../config/cache.js'), {POST_MODEL} = require('../config/constants');
 
 module.exports = function (passport) {
 
@@ -20,7 +19,9 @@ module.exports = function (passport) {
             .POSTS
             .getAllPostsInfo()
             .spread((result, metadata) => {
-                cache.event.emit("update-data",result);
+                // cache
+                //     .event
+                //     .emit("update-data", result);
                 let responseOptions = {
                     myPostsCollection: posts.getCurrentUsersPosts(result),
                     otherPostsCollection: posts.getOtherUsersPosts(result)
@@ -30,6 +31,11 @@ module.exports = function (passport) {
     });
 
     router.get('/profile/post/:id', (req, res) => {
+        cache
+            .getData
+            .then((result) => {
+                console.log("cache", result);
+            })
         blog
             .POSTS
             .getAllPostsInfo()
@@ -44,9 +50,9 @@ module.exports = function (passport) {
                             Name: postInfo[POST_MODEL.POST_AUTHOR],
                             Date: postInfo[POST_MODEL.POST_CREATION_DATE],
                             PostBody: postInfo[POST_MODEL.POST_CONTENT],
-                            detailID:postInfo[POST_MODEL.POST_DETAIL_ID]
+                            detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
                         },
-                        postComments:posts.getPostCommentsByPostId(req.params.id,result)
+                        postComments: posts.getPostCommentsByPostId(req.params.id, result)
                     };
                 res.render('post', responseOptions);
             })

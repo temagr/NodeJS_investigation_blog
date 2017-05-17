@@ -12,7 +12,17 @@ cache.update = (data) => {
         console.log("redis", reply);
     });
     console.log("updated");
-}
+};
+
+cache.getData = new Promise((resolve, reject) => {
+    client.get("appData", (err, reply) => {
+        if (err) {
+            reject(err);
+        } else {
+            resolve(reply);
+        }
+    });
+});
 
 cache.event = new events.EventEmitter();
 cache

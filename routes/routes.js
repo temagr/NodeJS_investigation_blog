@@ -15,7 +15,6 @@ module.exports = function (passport) {
     })
 
     router.get('/profile', (req, res) => {
-
         cache
             .getData
             .then((result) => {
@@ -79,7 +78,7 @@ module.exports = function (passport) {
                             responseOptions = {
                                 currentPost: {
                                     id: req.params.id,
-                                    currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
+                                    currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, JSON.parse(result)),
                                     averageRate: postInfo[POST_MODEL.POST_RATE],
                                     Title: postInfo[POST_MODEL.POST_TITLE],
                                     Name: postInfo[POST_MODEL.POST_AUTHOR],
@@ -87,7 +86,7 @@ module.exports = function (passport) {
                                     PostBody: postInfo[POST_MODEL.POST_CONTENT],
                                     detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
                                 },
-                                postComments: posts.getPostCommentsByPostId(req.params.id, result)
+                                postComments: posts.getPostCommentsByPostId(req.params.id, JSON.parse(result))
                             };
                             res.render('post', responseOptions);
                 }

@@ -2,6 +2,7 @@ const express = require('express'),
     router = express.Router(),
     blog = require('../models/blog.model'),
     posts = require('../models/post.model'),
+    cache = require('../config/cache.js'),
     {POST_MODEL} = require('../config/constants');
 
 module.exports = function (passport) {
@@ -19,6 +20,7 @@ module.exports = function (passport) {
             .POSTS
             .getAllPostsInfo()
             .spread((result, metadata) => {
+                cache.update(result);
                 let responseOptions = {
                     myPostsCollection: posts.getCurrentUsersPosts(result),
                     otherPostsCollection: posts.getOtherUsersPosts(result)

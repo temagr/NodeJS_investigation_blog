@@ -15,47 +15,84 @@ module.exports = function (passport) {
     })
 
     router.get('/profile', (req, res) => {
-        blog
-            .POSTS
-            .getAllPostsInfo()
-            .spread((result, metadata) => {
-                // cache
-                //     .event
-                //     .emit("update-data", result);
-                let responseOptions = {
-                    myPostsCollection: posts.getCurrentUsersPosts(result),
-                    otherPostsCollection: posts.getOtherUsersPosts(result)
-                };
-                res.render('profile', responseOptions);
+
+        cache
+            .getData
+            .then((result) => {
+                let responseOptions;
+                if (!result) {
+                    blog
+                        .POSTS
+                        .getAllPostsInfo()
+                        .spread((result, metadata) => {
+                            cache
+                                .event
+                                .emit("update-data", result);
+                            responseOptions = {
+                                myPostsCollection: posts.getCurrentUsersPosts(result),
+                                otherPostsCollection: posts.getOtherUsersPosts(result)
+                            };
+                            res.render('profile', responseOptions);
+                        })
+                } else {
+                    responseOptions = {
+                        myPostsCollection: posts.getCurrentUsersPosts(JSON.parse(result)),
+                        otherPostsCollection: posts.getOtherUsersPosts(JSON.parse(result))
+                    };
+                    res.render('profile', responseOptions);
+                }
             })
+
     });
 
     router.get('/profile/post/:id', (req, res) => {
         cache
             .getData
             .then((result) => {
-                console.log("cache", result);
+                let postInfo,responseOptions;
+                if (!result) {
+                    blog
+                        .POSTS
+                        .getAllPostsInfo()
+                        .spread((result, metadata) => {
+                            cache
+                                .event
+                                .emit("update-data", result);
+                            postInfo = posts.getPostInfoById(req.params.id, result);
+                            responseOptions = {
+                                currentPost: {
+                                    id: req.params.id,
+                                    currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
+                                    averageRate: postInfo[POST_MODEL.POST_RATE],
+                                    Title: postInfo[POST_MODEL.POST_TITLE],
+                                    Name: postInfo[POST_MODEL.POST_AUTHOR],
+                                    Date: postInfo[POST_MODEL.POST_CREATION_DATE],
+                                    PostBody: postInfo[POST_MODEL.POST_CONTENT],
+                                    detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
+                                },
+                                postComments: posts.getPostCommentsByPostId(req.params.id, result)
+                            };
+                            res.render('post', responseOptions);
+                        })
+                } else {
+                    postInfo = posts.getPostInfoById(req.params.id, JSON.parse(result));
+                            responseOptions = {
+                                currentPost: {
+                                    id: req.params.id,
+                                    currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
+                                    averageRate: postInfo[POST_MODEL.POST_RATE],
+                                    Title: postInfo[POST_MODEL.POST_TITLE],
+                                    Name: postInfo[POST_MODEL.POST_AUTHOR],
+                                    Date: postInfo[POST_MODEL.POST_CREATION_DATE],
+                                    PostBody: postInfo[POST_MODEL.POST_CONTENT],
+                                    detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
+                                },
+                                postComments: posts.getPostCommentsByPostId(req.params.id, result)
+                            };
+                            res.render('post', responseOptions);
+                }
             })
-        blog
-            .POSTS
-            .getAllPostsInfo()
-            .spread((result, metadata) => {
-                let postInfo = posts.getPostInfoById(req.params.id, result),
-                    responseOptions = {
-                        currentPost: {
-                            id: req.params.id,
-                            currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
-                            averageRate: postInfo[POST_MODEL.POST_RATE],
-                            Title: postInfo[POST_MODEL.POST_TITLE],
-                            Name: postInfo[POST_MODEL.POST_AUTHOR],
-                            Date: postInfo[POST_MODEL.POST_CREATION_DATE],
-                            PostBody: postInfo[POST_MODEL.POST_CONTENT],
-                            detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
-                        },
-                        postComments: posts.getPostCommentsByPostId(req.params.id, result)
-                    };
-                res.render('post', responseOptions);
-            })
+
     });
 
     router.post('/profile/post/:id/newComment', (req, res) => {

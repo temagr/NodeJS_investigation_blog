@@ -2,8 +2,7 @@ const express = require('express'),
     router = express.Router(),
     blog = require('../models/blog.model'),
     posts = require('../models/post.model'),
-    cache = require('../config/cache.js'), 
-    {POST_MODEL, CACHE} = require('../config/constants');
+    cache = require('../config/cache.js'), {POST_MODEL, CACHE} = require('../config/constants');
 
 module.exports = function (passport) {
 
@@ -99,8 +98,21 @@ module.exports = function (passport) {
     router.post('/profile/post/:id/newComment', (req, res) => {
         blog
             .COMMENTS
-            .addComment(req.body.comment, req.query.ownerId, req.query.detailId);
-        res.redirect('../' + req.params.id + '?userId=' + global.User.id);
+            .addComment(req.body.comment, req.query.ownerId, req.query.detailId)
+            .spread((result, metadata) => {
+                // CACHE update on comment adding
+                blog
+                    .POSTS
+                    .getAllPostsInfo()
+                    .spread((result, metadata) => {
+                        cache
+                            .event
+                            .emit(CACHE.EVENTS.UPDATE_DATA, result, () => {
+                                res.redirect('../' + req.params.id + '?userId=' + global.User.id);
+                            });
+                    });
+            });
+
     })
 
     router.post('/profile/post/:id/rate', (req, res) => {

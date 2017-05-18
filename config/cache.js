@@ -1,6 +1,7 @@
 const redis = require('redis'),
     client = redis.createClient(),
     events = require('events'),
+    {CACHE} = require('./constants.js');
     cache = {};
 
 client.on('connect', function () {
@@ -8,14 +9,14 @@ client.on('connect', function () {
 });
 
 cache.update = (data) => {
-    client.set("appData", JSON.stringify(data), (err, reply) => {
+    client.set(CACHE.STORAGE.APP_DATA, JSON.stringify(data), (err, reply) => {
         console.log("redis", reply);
     });
     console.log("updated");
 };
 
 cache.getData = new Promise((resolve, reject) => {
-    client.get("appData", (err, reply) => {
+    client.get(CACHE.STORAGE.APP_DATA, (err, reply) => {
         if (err) {
             reject(err);
         } else {
@@ -27,6 +28,6 @@ cache.getData = new Promise((resolve, reject) => {
 cache.event = new events.EventEmitter();
 cache
     .event
-    .on('update-data', cache.update);
+    .on(CACHE.EVENTS.UPDATE_DATA, cache.update);
 
 module.exports = cache;

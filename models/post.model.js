@@ -65,7 +65,7 @@ posts.getPostCommentsByPostId = (postId, posts) => {
     return currentPostInfo.map((item) => {
         return {
             commentContent: item[POST_MODEL.POST_COMMENT_CONTENT],
-            Date: item[POST_MODEL.POST_COMMENT_CREATION_DATE],
+            Date: new Date(Date.parse(item[POST_MODEL.POST_COMMENT_CREATION_DATE])),
             Name: item[POST_MODEL.POST_COMMENT_AUTHOR]
         }
     })

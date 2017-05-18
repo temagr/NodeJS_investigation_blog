@@ -2,7 +2,8 @@ const express = require('express'),
     router = express.Router(),
     blog = require('../models/blog.model'),
     posts = require('../models/post.model'),
-    cache = require('../config/cache.js'), {POST_MODEL} = require('../config/constants');
+    cache = require('../config/cache.js'), 
+    {POST_MODEL, CACHE} = require('../config/constants');
 
 module.exports = function (passport) {
 
@@ -26,7 +27,7 @@ module.exports = function (passport) {
                         .spread((result, metadata) => {
                             cache
                                 .event
-                                .emit("update-data", result);
+                                .emit(CACHE.EVENTS.UPDATE_DATA, result);
                             responseOptions = {
                                 myPostsCollection: posts.getCurrentUsersPosts(result),
                                 otherPostsCollection: posts.getOtherUsersPosts(result)
@@ -48,7 +49,8 @@ module.exports = function (passport) {
         cache
             .getData
             .then((result) => {
-                let postInfo,responseOptions;
+                let postInfo,
+                    responseOptions;
                 if (!result) {
                     blog
                         .POSTS
@@ -56,7 +58,7 @@ module.exports = function (passport) {
                         .spread((result, metadata) => {
                             cache
                                 .event
-                                .emit("update-data", result);
+                                .emit(CACHE.EVENTS.UPDATE_DATA, result);
                             postInfo = posts.getPostInfoById(req.params.id, result);
                             responseOptions = {
                                 currentPost: {
@@ -75,20 +77,20 @@ module.exports = function (passport) {
                         })
                 } else {
                     postInfo = posts.getPostInfoById(req.params.id, JSON.parse(result));
-                            responseOptions = {
-                                currentPost: {
-                                    id: req.params.id,
-                                    currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, JSON.parse(result)),
-                                    averageRate: postInfo[POST_MODEL.POST_RATE],
-                                    Title: postInfo[POST_MODEL.POST_TITLE],
-                                    Name: postInfo[POST_MODEL.POST_AUTHOR],
-                                    Date: postInfo[POST_MODEL.POST_CREATION_DATE],
-                                    PostBody: postInfo[POST_MODEL.POST_CONTENT],
-                                    detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
-                                },
-                                postComments: posts.getPostCommentsByPostId(req.params.id, JSON.parse(result))
-                            };
-                            res.render('post', responseOptions);
+                    responseOptions = {
+                        currentPost: {
+                            id: req.params.id,
+                            currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, JSON.parse(result)),
+                            averageRate: postInfo[POST_MODEL.POST_RATE],
+                            Title: postInfo[POST_MODEL.POST_TITLE],
+                            Name: postInfo[POST_MODEL.POST_AUTHOR],
+                            Date: new Date(Date.parse(postInfo[POST_MODEL.POST_CREATION_DATE])),
+                            PostBody: postInfo[POST_MODEL.POST_CONTENT],
+                            detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
+                        },
+                        postComments: posts.getPostCommentsByPostId(req.params.id, JSON.parse(result))
+                    };
+                    res.render('post', responseOptions);
                 }
             })
 

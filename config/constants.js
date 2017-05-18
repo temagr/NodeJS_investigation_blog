@@ -64,3 +64,12 @@ exports.POST_MODEL = {
   POST_RATE: "postRate",
   CURRENT_USERS_RATE: "currentUsersRate"
 }
+
+exports.CACHE = {
+  STORAGE:{
+    APP_DATA:"appData"
+  },
+  EVENTS:{
+    UPDATE_DATA:"update-data"
+  }
+};

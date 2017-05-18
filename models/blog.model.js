@@ -1,8 +1,8 @@
 const DB = require('../config/constants');
 
-const dataBase = require('../database/database')(DB.BLOG, 'dbadmin', 'password', {
-    host: 'ROTARE',
-    port: 1433,
+const dataBase = require('../database/database')(DB.BLOG, 'admin', '123456', {
+    host: 'RUKAVITSINI',
+    port: 1555,
     dialect: 'mssql'
   }),
   blog = {

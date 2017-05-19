@@ -68,7 +68,9 @@ posts.getPostCommentsByPostId = (postId, posts) => {
             Date: new Date(Date.parse(item[POST_MODEL.POST_COMMENT_CREATION_DATE])),
             Name: item[POST_MODEL.POST_COMMENT_AUTHOR]
         }
-    })
+    }).sort((a, b) => {
+        return (a.Date.getTime() - b.Date.getTime())
+    });
 }
 
 posts.isPostRatedByCurrentUser = (postId, posts) => {

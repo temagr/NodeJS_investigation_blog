@@ -16,7 +16,7 @@ module.exports = function (passport) {
 
     router.get('/profile', (req, res) => {
         cache
-            .getData
+            .getData()
             .then((result) => {
                 let responseOptions;
                 if (!result) {
@@ -46,7 +46,7 @@ module.exports = function (passport) {
 
     router.get('/profile/post/:id', (req, res) => {
         cache
-            .getData
+            .getData()
             .then((result) => {
                 let postInfo,
                     responseOptions;

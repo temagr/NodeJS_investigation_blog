@@ -1,6 +1,6 @@
 const redis = require('redis'),
-    events = require('events'), 
-    {CACHE} = require('./constants.js'),
+    events = require('events'), {CACHE} = require('./constants.js'),
+    client = redis.createClient(),
     cache = {};
 
 if (process.env.NODE_ENV === "development") {
@@ -11,7 +11,6 @@ if (process.env.NODE_ENV === "development") {
 }
 
 cache.update = (data, callback) => {
-    let client = redis.createClient();
     client.set(CACHE.STORAGE.APP_DATA, JSON.stringify(data), (err, reply) => {
         if (process.env.NODE_ENV === "development") {
             console.log("redis", reply);
@@ -23,22 +22,20 @@ cache.update = (data, callback) => {
     if (process.env.NODE_ENV === "development") {
         console.log("updated");
     }
-    client.quit();
 };
 
-cache.getData = new Promise((resolve, reject) => {
-    let client = redis.createClient();
-    client.get(CACHE.STORAGE.APP_DATA, (err, reply) => {
-        console.log("GOT");
-        if (err) {
-            client.quit();
-            reject(err);
-        } else {
-            client.quit();
-            resolve(reply);
-        }
-    });
-});
+cache.getData = () => {
+    return new Promise((resolve, reject) => {
+        client.get(CACHE.STORAGE.APP_DATA, (err, reply) => {
+            console.log("GOT");
+            if (err) {
+                reject(err);
+            } else {
+                resolve(reply);
+            }
+        });
+    })
+};
 
 cache.event = new events.EventEmitter();
 cache

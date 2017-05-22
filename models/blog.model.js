@@ -20,7 +20,7 @@ blog.USERS.getUserByCredentials = (username, password) => {
 }
 
 blog.POSTS.addPost = (title, content) => {
-  dataBase(`DECLARE @TranName VARCHAR(20);
+  return dataBase(`DECLARE @TranName VARCHAR(20);
             SELECT @TranName = 'AddPost';
             BEGIN TRANSACTION @TranName
                 DECLARE @CurrentPostID int;

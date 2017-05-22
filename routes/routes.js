@@ -1,8 +1,6 @@
 const express = require('express'),
     router = express.Router(),
-    blog = require('../models/blog.model'),
-    posts = require('../models/post.model'),
-    cache = require('../config/cache.js'), {POST_MODEL, CACHE} = require('../config/constants');
+    data = require('../dataAccessLayer');
 
 module.exports = function (passport) {
 
@@ -15,111 +13,36 @@ module.exports = function (passport) {
     })
 
     router.get('/profile', (req, res) => {
-        cache
-            .getData()
-            .then((result) => {
-                let responseOptions;
-                if (!result) {
-                    blog
-                        .POSTS
-                        .getAllPostsInfo()
-                        .spread((result, metadata) => {
-                            cache
-                                .event
-                                .emit(CACHE.EVENTS.UPDATE_DATA, result);
-                            responseOptions = {
-                                myPostsCollection: posts.getCurrentUsersPosts(result),
-                                otherPostsCollection: posts.getOtherUsersPosts(result)
-                            };
-                            res.render('profile', responseOptions);
-                        })
-                } else {
-                    responseOptions = {
-                        myPostsCollection: posts.getCurrentUsersPosts(JSON.parse(result)),
-                        otherPostsCollection: posts.getOtherUsersPosts(JSON.parse(result))
-                    };
-                    res.render('profile', responseOptions);
-                }
+        data
+            .getProfileInfo()
+            .then((profileInfo) => {
+                res.render('profile', profileInfo);
             })
-
     });
 
     router.get('/profile/post/:id', (req, res) => {
-        cache
-            .getData()
-            .then((result) => {
-                let postInfo,
-                    responseOptions;
-                if (!result) {
-                    blog
-                        .POSTS
-                        .getAllPostsInfo()
-                        .spread((result, metadata) => {
-                            cache
-                                .event
-                                .emit(CACHE.EVENTS.UPDATE_DATA, result);
-                            postInfo = posts.getPostInfoById(req.params.id, result);
-                            responseOptions = {
-                                currentPost: {
-                                    id: req.params.id,
-                                    currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, result),
-                                    averageRate: postInfo[POST_MODEL.POST_RATE],
-                                    Title: postInfo[POST_MODEL.POST_TITLE],
-                                    Name: postInfo[POST_MODEL.POST_AUTHOR],
-                                    Date: postInfo[POST_MODEL.POST_CREATION_DATE],
-                                    PostBody: postInfo[POST_MODEL.POST_CONTENT],
-                                    detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
-                                },
-                                postComments: posts.getPostCommentsByPostId(req.params.id, result)
-                            };
-                            res.render('post', responseOptions);
-                        })
-                } else {
-                    postInfo = posts.getPostInfoById(req.params.id, JSON.parse(result));
-                    responseOptions = {
-                        currentPost: {
-                            id: req.params.id,
-                            currentUsersRate: posts.isPostRatedByCurrentUser(req.params.id, JSON.parse(result)),
-                            averageRate: postInfo[POST_MODEL.POST_RATE],
-                            Title: postInfo[POST_MODEL.POST_TITLE],
-                            Name: postInfo[POST_MODEL.POST_AUTHOR],
-                            Date: new Date(Date.parse(postInfo[POST_MODEL.POST_CREATION_DATE])),
-                            PostBody: postInfo[POST_MODEL.POST_CONTENT],
-                            detailID: postInfo[POST_MODEL.POST_DETAIL_ID]
-                        },
-                        postComments: posts.getPostCommentsByPostId(req.params.id, JSON.parse(result))
-                    };
-                    res.render('post', responseOptions);
-                }
+        data
+            .getPostById(req.params.id)
+            .then((postInfo) => {
+                res.render('post', postInfo);
             })
-
     });
 
     router.post('/profile/post/:id/newComment', (req, res) => {
-        blog
-            .COMMENTS
-            .addComment(req.body.comment, req.query.ownerId, req.query.detailId)
-            .spread((result, metadata) => {
-                // CACHE update on comment adding
-                blog
-                    .POSTS
-                    .getAllPostsInfo()
-                    .spread((result, metadata) => {
-                        cache
-                            .event
-                            .emit(CACHE.EVENTS.UPDATE_DATA, result, () => {
-                                res.redirect('../' + req.params.id + '?userId=' + global.User.id);
-                            });
-                    });
-            });
-
+        data
+            .addCommentToThePost(req.body.comment, req.query.ownerId, req.query.detailId)
+            .then(() => {
+                res.redirect('../' + req.params.id + '?userId=' + global.User.id);
+            })
     })
 
     router.post('/profile/post/:id/rate', (req, res) => {
-        blog
-            .RATES
-            .setRate(req.body.rating, req.params.id, req.query.ownerId);
-        res.redirect('../' + req.params.id + '?userId=' + global.User.id);
+        data
+            .setRateToThePost(req.body.rating, req.params.id, req.query.ownerId)
+            .then(() => {
+                res.redirect('../' + req.params.id + '?userId=' + global.User.id);
+            });
+
     })
 
     router.get('/profile/newPost', (req, res) => {
@@ -127,10 +50,11 @@ module.exports = function (passport) {
     });
 
     router.post('/profile/newPost', (req, res) => {
-        blog
-            .POSTS
-            .addPost(req.body.title, req.body.content);
-        res.redirect('/profile');
+        data
+            .addPost(req.body.title, req.body.content)
+            .then(() => {
+                res.redirect('/profile');
+            })
     });
 
     router.post('/login', passport.authenticate('local', {

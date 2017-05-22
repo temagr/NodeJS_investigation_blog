@@ -1,10 +1,7 @@
-const DB = require('../config/constants');
+const DB = require('../config/constants'),
+  config = require('../config/config.js').get(process.env.NODE_ENV);
 
-const dataBase = require('../database/database')(DB.BLOG, 'admin', '123456', {
-    host: 'RUKAVITSINI',
-    port: 1555,
-    dialect: 'mssql'
-  }),
+const dataBase = require('../database/database')(DB.BLOG, config.database.login, config.database.password, config.database.options),
   blog = {
     USERS: {},
     POSTS: {},
@@ -101,7 +98,7 @@ blog.POSTS.getAllPostsInfo = () => {
                                    C.[${DB.columns.BLOG.COMMENTS.DATE}], 
                                    C.[${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID}], 
                                    U2.[${DB.columns.BLOG.USERS.NAME}]`);
-                                   
+
 }
 
 blog.COMMENTS.getCommentsForPostByDetailId = (id) => {

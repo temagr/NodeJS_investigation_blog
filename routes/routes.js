@@ -3,6 +3,14 @@ const express = require('express'),
     data = require('../dataAccessLayer');
 
 module.exports = function (passport) {
+    // serverErrorHandler
+    router.use((req, res, next) => {
+        if (global.serverError) {
+            res.render('errorPage');
+        } else {
+            next();
+        }
+    });
 
     router.get('/', (req, res) => {
         res.render('index');
@@ -10,21 +18,26 @@ module.exports = function (passport) {
 
     router.get('/login', (req, res) => {
         res.render('login');
-    })
+    });
 
     router.get('/profile', (req, res) => {
+        console.time("Profile_Benchmark");
         data
             .getProfileInfo()
             .then((profileInfo) => {
                 res.render('profile', profileInfo);
-            })
+                console.timeEnd("Profile_Benchmark");
+            });
+
     });
 
     router.get('/profile/post/:id', (req, res) => {
+        console.time("Post_Benchmark");
         data
             .getPostById(req.params.id)
             .then((postInfo) => {
                 res.render('post', postInfo);
+                console.timeEnd("Post_Benchmark");
             })
     });
 
@@ -34,7 +47,7 @@ module.exports = function (passport) {
             .then(() => {
                 res.redirect('../' + req.params.id + '?userId=' + global.User.id);
             })
-    })
+    });
 
     router.post('/profile/post/:id/rate', (req, res) => {
         data
@@ -43,7 +56,7 @@ module.exports = function (passport) {
                 res.redirect('../' + req.params.id + '?userId=' + global.User.id);
             });
 
-    })
+    });
 
     router.get('/profile/newPost', (req, res) => {
         res.render('newPost');

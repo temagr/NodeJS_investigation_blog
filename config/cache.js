@@ -27,7 +27,6 @@ cache.update = (data, callback) => {
 cache.getData = () => {
     return new Promise((resolve, reject) => {
         client.get(CACHE.STORAGE.APP_DATA, (err, reply) => {
-            console.log("GOT");
             if (err) {
                 reject(err);
             } else {

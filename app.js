@@ -20,8 +20,8 @@ app.set('view engine', 'pug');
 
 // App middleware
 
-if(process.env.NODE_ENV === "development"){
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") {
+    app.use(morgan('dev'));
 }
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -31,6 +31,10 @@ app.use(session({secret: 'keyboard cat', resave: true, saveUninitialized: true, 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/', routes)
+app.use('/', routes);
+
+// app.use((err, req, res, next) => {     res.status(err.status || 500);
+// res.render('error', {         message: err.message,         error: err
+// });     next(); });
 
 module.exports = app;

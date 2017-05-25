@@ -11,7 +11,7 @@ var config = {
             }
         },
         cache: {
-            shouldBeUsed: false
+            shouldBeUsed: true
         }
     }
 }

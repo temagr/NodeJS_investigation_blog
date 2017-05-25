@@ -15,7 +15,8 @@ module.exports = function(passport) {
     });
 
     passport.use('local', new LocalStrategy((username, password, done) => {
-        Model.USERS.getUserByCredentials(username, password).spread((result, metadata) => {
+        Model.USERS.getUserByCredentials(username, password)
+        .spread((result, metadata) => {
             if (result.length === 1) {
                 global.User = {
                     id: result[0][`${DB.columns.BLOG.USERS.USER_ID}`],

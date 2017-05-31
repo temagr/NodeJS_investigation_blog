@@ -12,10 +12,7 @@ const connect = (...args) => {
       global.serverError = true;
       console.warn('Unable to connect to the database:', err);
     });
-
-  return function (sql) {
-    return dataBase.query(sql);
-  };
+  return dataBase;
 }
 
 module.exports = connect;

@@ -121,7 +121,13 @@ blog.USERS.getUserByCredentials = (username, password) => {
 }
 
 blog.POSTS.getAllPostsInfo = () => {
-  return new Promise((resolve, reject) => {})
+  return new Promise((resolve, reject) => {
+    dataBase.sync().then(() => {
+      Post.findAll({
+        
+      });
+    })
+  })
 }
 
 // blog.POSTS.getAllPostsInfo = () => {   return dataBase(`     SELECT

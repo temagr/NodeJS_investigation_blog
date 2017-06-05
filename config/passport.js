@@ -16,20 +16,21 @@ module.exports = function(passport) {
 
     passport.use('local', new LocalStrategy((username, password, done) => {
         Model.USERS.getUserByCredentials(username, password)
-        .spread((result, metadata) => {
-            if (result.length === 1) {
+        .then((result) => {
+            
                 global.User = {
-                    id: result[0][`${DB.columns.BLOG.USERS.USER_ID}`],
-                    name: result[0][`${DB.columns.BLOG.USERS.NAME}`],
-                    password: result[0][`${DB.columns.BLOG.USERS.PASSWORD}`]
+                    id: result[`${DB.columns.BLOG.USERS.USER_ID}`],
+                    name: result[`${DB.columns.BLOG.USERS.NAME}`],
+                    password: result[`${DB.columns.BLOG.USERS.PASSWORD}`]
                 };
+
                 return done(null, {
-                    userId: result[0][`${DB.columns.BLOG.USERS.USER_ID}`],
-                    username: result[0][`${DB.columns.BLOG.USERS.NAME}`]
+                    userId: result[`${DB.columns.BLOG.USERS.USER_ID}`],
+                    username: result[`${DB.columns.BLOG.USERS.NAME}`]
                 });
-            } else {
-                return done(null, false);
-            }
+            
+        }).catch(() => {
+            return done(null, false);
         });
     }));
 

@@ -73,79 +73,59 @@ const PostDetail = dataBase.define('PostDetails', {
   }
 }, {timestamps: false})
 
+const Rates = dataBase.define('Rates', {
+  rateID: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  postID: {
+    type: Sequelize.INTEGER
+  },
+  userID: {
+    type: Sequelize.INTEGER
+  },
+  rate: {
+    type: Sequelize.FLOAT
+  }
+});
+
 User.hasMany(Post, {foreignKey: 'OwnerID'});
 User.hasMany(Comment, {foreignKey: 'commentOwnerID'});
+User.hasMany(Rates,{foreignKey: 'userID'});
 Post.hasOne(PostDetail, {foreignKey: 'postID'});
-PostDetail.hasMany(Comment, {foreignKey: "postDetailID"})
+Post.hasMany(Rates,{foreignKey: 'postID'});
+PostDetail.hasMany(Comment, {foreignKey: "postDetailID"});
 
-dataBase
-  .sync()
-  .then(() => {
-
-    User.findAll({
-      include: [
-        {
-          model: Post,
+blog.USERS.getUserByCredentials = (username, password) => {
+  return new Promise((resolve, reject) => {
+    dataBase
+      .sync()
+      .then(() => {
+        User
+          .findAll({
           where: {
-            OwnerID: 2
-          },
-          include: [
-            {
-              model: PostDetail,
-              include: [
-                {
-                  model: Comment
-                }
-              ]
+            Name: username,
+            Password: password
+          }
+        })
+          .then((users) => {
+            if (!users.length || users.length > 1) {
+              reject(users)
+            } else {
+              resolve(users[0].get())
             }
-          ]
-        }
-      ]
-    }).then((post) => {
-      let result = post[0].get();
-      console.log(result);
-    })
+          })
+      })
+  })
+}
 
-  });
+blog.POSTS.getAllPostsInfo = () => {
+  return new Promise((resolve, reject) => {})
+}
 
-//  blog.USERS.getUserByCredentials = (username, password) => { return
-// dataBase(`SELECT ${DB.columns.BLOG.USERS.USER_ID},
-// ${DB.columns.BLOG.USERS.NAME}, ${DB.columns.BLOG.USERS.EMAIL},
-// ${DB.columns.BLOG.USERS.PASSWORD}             FROM ${DB.tables.BLOG.USERS}
-// WHERE ${DB.columns.BLOG.USERS.NAME}='${username}' and
-// ${DB.columns.BLOG.USERS.PASSWORD}='${password}'`); } blog.POSTS.addPost =
-// (title, content) => {   return dataBase(`DECLARE @TranName VARCHAR(20);
-// SELECT @TranName = 'AddPost';             BEGIN TRANSACTION @TranName DECLARE
-// @CurrentPostID int;                 INSERT INTO [${DB.tables.BLOG.POSTS}]
-// (${DB.columns.BLOG.POSTS.TITLE}, [${DB.columns.BLOG.POSTS.DATE}],
-// ${DB.columns.BLOG.POSTS.OWNER_ID}) VALUES (  '${title}', GETDATE(),
-// ${global.User.id});           SELECT @CurrentPostID = SCOPE_IDENTITY();
-// INSERT INTO [${DB.tables.BLOG.POST_DETAILS}]
-// (${DB.columns.BLOG.POST_DETAILS.POST_ID},
-// ${DB.columns.BLOG.POST_DETAILS.CONTENT})                 VALUES (
-// @CurrentPostID,                   '${content}'                 ); COMMIT
-// TRANSACTION @TranName`); } blog.POSTS.getCurrentUserLatestPosts = () => {
-// return dataBase(`     SELECT TOP ${DB.POST_NUMBER}
-// ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.POST_ID}     FROM
-// ${DB.tables.BLOG.POSTS}     WHERE ${DB.columns.BLOG.POSTS.OWNER_ID} =
-// ${global.User.id}     ORDER BY ${DB.columns.BLOG.POSTS.DATE} DESC`); }
-// blog.POSTS.getOtherUsersLatestPosts = () => {   return dataBase(`     SELECT
-// TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE},
-// ${DB.columns.BLOG.POSTS.POST_ID}, ${DB.columns.BLOG.USERS.NAME}     FROM
-// ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.USERS}     WHERE
-// ${DB.columns.BLOG.POSTS.OWNER_ID} <> ${global.User.id}     and
-// ${DB.columns.BLOG.POSTS.OWNER_ID} = ${DB.columns.BLOG.USERS.USER_ID} ORDER BY
-// ${DB.columns.BLOG.POSTS.DATE} DESC`); } blog.POSTS.getPostById = (id) => {
-// return dataBase(`       SELECT ${DB.columns.BLOG.POSTS.TITLE},
-// ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT},
-// ${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}, ${DB.columns.BLOG.USERS.NAME} FROM
-// ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.POST_DETAILS},
-// ${DB.tables.BLOG.USERS}       WHERE
-// ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.POST_ID} = ${id}       and
-// ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} =
-// ${id}       and ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.OWNER_ID} =
-// ${DB.columns.BLOG.USERS.USER_ID}`); } blog.POSTS.getAllPostsInfo = () => {
-// return dataBase(`     SELECT P.[${DB.columns.BLOG.POSTS.POST_ID}] as postId,
+// blog.POSTS.getAllPostsInfo = () => {   return dataBase(`     SELECT
+// P.[${DB.columns.BLOG.POSTS.POST_ID}] as postId,
 // P.[${DB.columns.BLOG.POSTS.TITLE}] as postTitle,
 // P.[${DB.columns.BLOG.POSTS.DATE}] as postCreationDate,
 // P.[${DB.columns.BLOG.POSTS.OWNER_ID}] as postAuthorId,
@@ -183,7 +163,38 @@ dataBase
 // C.[${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT}],
 // C.[${DB.columns.BLOG.COMMENTS.DATE}],
 // C.[${DB.columns.BLOG.COMMENTS.COMMENT_OWNER_ID}],
-// U2.[${DB.columns.BLOG.USERS.NAME}]`); }
+// U2.[${DB.columns.BLOG.USERS.NAME}]`); } blog.POSTS.addPost =   (title,
+// content) => {     return dataBase(`DECLARE @TranName VARCHAR(20); SELECT
+// @TranName = 'AddPost';             BEGIN TRANSACTION @TranName DECLARE
+// @CurrentPostID int;                 INSERT INTO [${DB.tables.BLOG.POSTS}]
+// (${DB.columns.BLOG.POSTS.TITLE}, [${DB.columns.BLOG.POSTS.DATE}],
+// ${DB.columns.BLOG.POSTS.OWNER_ID}) VALUES (  '${title}', GETDATE(),
+// ${global.User.id});           SELECT @CurrentPostID = SCOPE_IDENTITY();
+// INSERT INTO [${DB.tables.BLOG.POST_DETAILS}]
+// (${DB.columns.BLOG.POST_DETAILS.POST_ID},
+// ${DB.columns.BLOG.POST_DETAILS.CONTENT})                 VALUES (
+// @CurrentPostID,                   '${content}'                 ); COMMIT
+// TRANSACTION @TranName`);   } blog.POSTS.getCurrentUserLatestPosts = () => {
+// return dataBase(`     SELECT TOP ${DB.POST_NUMBER}
+// ${DB.columns.BLOG.POSTS.TITLE}, ${DB.columns.BLOG.POSTS.POST_ID}     FROM
+// ${DB.tables.BLOG.POSTS}     WHERE ${DB.columns.BLOG.POSTS.OWNER_ID} =
+// ${global.User.id}     ORDER BY ${DB.columns.BLOG.POSTS.DATE} DESC`); }
+// blog.POSTS.getOtherUsersLatestPosts = () => {   return dataBase(`     SELECT
+// TOP ${DB.POST_NUMBER} ${DB.columns.BLOG.POSTS.TITLE},
+// ${DB.columns.BLOG.POSTS.POST_ID}, ${DB.columns.BLOG.USERS.NAME}     FROM
+// ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.USERS}     WHERE
+// ${DB.columns.BLOG.POSTS.OWNER_ID} <> ${global.User.id}     and
+// ${DB.columns.BLOG.POSTS.OWNER_ID} = ${DB.columns.BLOG.USERS.USER_ID} ORDER BY
+// ${DB.columns.BLOG.POSTS.DATE} DESC`); } blog.POSTS.getPostById = (id) => {
+// return dataBase(`       SELECT ${DB.columns.BLOG.POSTS.TITLE},
+// ${DB.columns.BLOG.POSTS.DATE}, ${DB.columns.BLOG.POST_DETAILS.CONTENT},
+// ${DB.columns.BLOG.POST_DETAILS.DETAIL_ID}, ${DB.columns.BLOG.USERS.NAME} FROM
+// ${DB.tables.BLOG.POSTS}, ${DB.tables.BLOG.POST_DETAILS},
+// ${DB.tables.BLOG.USERS}       WHERE
+// ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.POST_ID} = ${id}       and
+// ${DB.tables.BLOG.POST_DETAILS}.${DB.columns.BLOG.POST_DETAILS.POST_ID} =
+// ${id}       and ${DB.tables.BLOG.POSTS}.${DB.columns.BLOG.POSTS.OWNER_ID} =
+// ${DB.columns.BLOG.USERS.USER_ID}`); }
 // blog.COMMENTS.getCommentsForPostByDetailId = (id) => {   return dataBase(`
 // SELECT ${DB.columns.BLOG.COMMENTS.COMMENT_CONTENT},
 // ${DB.columns.BLOG.COMMENTS.DATE}, ${DB.columns.BLOG.USERS.NAME}       FROM

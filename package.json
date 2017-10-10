@@ -22,6 +22,7 @@
     "pug": "^2.0.0-beta11",
     "redis": "^2.7.1",
     "sequelize": "^3.30.4",
+    "sql-query": "^0.1.26",
     "tedious": "^2.0.0"
   },
   "devDependencies": {
